@@ -8,12 +8,15 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        // Clear any old localStorage session data
+        localStorage.removeItem('user');
+
+        const storedUser = sessionStorage.getItem('user');
         if (storedUser) {
             try {
                 setUser(JSON.parse(storedUser));
             } catch (e) {
-                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
             }
         }
         setLoading(false);
@@ -23,7 +26,8 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data } = await axios.post(`${import.meta.env.VITE_AUTH_URL || 'http://localhost:5000/api'}/auth/login`, { email, password });
             setUser(data);
-            localStorage.setItem('user', JSON.stringify(data));
+            sessionStorage.setItem('user', JSON.stringify(data));
+            localStorage.removeItem('user');
             return { success: true };
         } catch (error) {
             return {
@@ -35,13 +39,14 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         setUser(null);
+        sessionStorage.removeItem('user');
         localStorage.removeItem('user');
     };
 
     const updateUser = (userData) => {
         setUser(prev => {
             const updated = { ...prev, ...userData };
-            localStorage.setItem('user', JSON.stringify(updated));
+            sessionStorage.setItem('user', JSON.stringify(updated));
             return updated;
         });
     };

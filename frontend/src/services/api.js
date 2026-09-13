@@ -7,7 +7,7 @@ const api = axios.create({
 // Request interceptor for adding the bearer token
 api.interceptors.request.use(
     (config) => {
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(sessionStorage.getItem('user'));
         if (user && user.token) {
             config.headers.Authorization = `Bearer ${user.token}`;
         }
@@ -24,6 +24,7 @@ api.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             // clear storage and redirect to login if token expired or invalid
+            sessionStorage.removeItem('user');
             localStorage.removeItem('user');
             window.location.href = '/login';
         }

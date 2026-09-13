@@ -1,6 +1,6 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AuthProvider, AuthContext } from './context/AuthContext';
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
@@ -20,6 +20,28 @@ import ResultReport from './pages/results/ResultReport';
 import ReportCard from './pages/students/ReportCard';
 import ReportsHub from './pages/reports/ReportsHub';
 
+const RootRoute = () => {
+    const { user, loading } = useContext(AuthContext);
+    const location = useLocation();
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        if (location.pathname === '/') {
+            return <LandingPage />;
+        }
+        return <Navigate to="/login" replace />;
+    }
+
+    return <Layout />;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -30,8 +52,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
-          {/* Protected Routes */}
-          <Route path="/" element={<Layout />}>
+          {/* Protected & Root Routes */}
+          <Route path="/" element={<RootRoute />}>
             <Route index element={<Dashboard />} />
             <Route path="profile" element={<Profile />} />
             <Route path="students" element={<StudentList />} />
