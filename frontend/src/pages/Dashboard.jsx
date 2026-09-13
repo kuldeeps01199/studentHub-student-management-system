@@ -314,10 +314,10 @@ const Dashboard = () => {
                             <div>
                                 <div className="flex justify-between text-xs font-bold text-slate-700 mb-1.5">
                                     <span className="flex items-center gap-1.5"><XCircle size={14} className="text-rose-500" /> Absent Students</span>
-                                    <span className="text-rose-600">{stats.absentStudents} Students ({100 - stats.todayAttendancePct}%)</span>
+                                    <span className="text-rose-600">{stats.absentStudents} Students ({stats.totalAttendanceRecords > 0 ? (100 - stats.todayAttendancePct) : 0}%)</span>
                                 </div>
                                 <div className="w-full bg-slate-100 rounded-full h-3">
-                                    <div className="bg-rose-500 h-3 rounded-full transition-all duration-500" style={{ width: `${100 - stats.todayAttendancePct}%` }}></div>
+                                    <div className="bg-rose-500 h-3 rounded-full transition-all duration-500" style={{ width: `${stats.totalAttendanceRecords > 0 ? (100 - stats.todayAttendancePct) : 0}%` }}></div>
                                 </div>
                             </div>
 
