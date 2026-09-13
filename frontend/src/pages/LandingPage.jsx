@@ -110,29 +110,29 @@ const LandingPage = () => {
             <PublicNavbar />
 
             {/* Hero Section */}
-            <section className="bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 text-white py-24 px-4 relative overflow-hidden">
+            <section className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-indigo-900 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-900 text-white py-24 px-4 relative overflow-hidden transition-colors duration-200">
                 <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:16px_16px]"></div>
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <div className="inline-flex items-center space-x-2 bg-indigo-500/10 text-indigo-300 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-indigo-500/20 backdrop-blur-sm">
-                        <Zap size={14} className="text-indigo-400 animate-pulse" />
+                    <div className="inline-flex items-center space-x-2 bg-white/10 dark:bg-indigo-500/10 text-indigo-100 dark:text-indigo-300 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/20 dark:border-indigo-500/20 backdrop-blur-sm">
+                        <Zap size={14} className="text-amber-300 dark:text-indigo-400 animate-pulse" />
                         <span>Fully Digital · Real-time · MongoDB Powered</span>
                     </div>
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
                         The Smart Way to Manage
-                        <span className="bg-gradient-to-r from-indigo-300 via-indigo-200 to-indigo-400 bg-clip-text text-transparent block mt-1">
+                        <span className="bg-gradient-to-r from-indigo-200 via-white to-indigo-200 dark:from-indigo-300 dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent block mt-1">
                             Your Institution
                         </span>
                     </h1>
-                    <p className="text-lg sm:text-xl text-indigo-200/90 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
+                    <p className="text-lg sm:text-xl text-indigo-100/90 dark:text-indigo-200/90 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
                         Replace paper registers and complex spreadsheets with a modern, centralized platform
                         for students, teachers, attendance, results, and administrative oversight.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link to="/signup" className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3.5 rounded-xl font-semibold flex items-center space-x-2 transition-all duration-200 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/40 text-lg hover:-translate-y-0.5">
+                        <Link to="/signup" className="bg-white text-indigo-700 hover:bg-indigo-50 px-8 py-3.5 rounded-xl font-semibold flex items-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl text-lg hover:-translate-y-0.5">
                             <span>Get Started Free</span>
                             <ArrowRight size={20} />
                         </Link>
-                        <Link to="/login" className="border border-indigo-400/40 text-indigo-100 hover:bg-white/10 px-8 py-3.5 rounded-xl font-semibold transition-all duration-200 backdrop-blur-sm text-lg">
+                        <Link to="/login" className="border border-white/40 dark:border-indigo-400/40 text-white dark:text-indigo-100 hover:bg-white/10 px-8 py-3.5 rounded-xl font-semibold transition-all duration-200 backdrop-blur-sm text-lg">
                             Sign In
                         </Link>
                     </div>
@@ -140,12 +140,12 @@ const LandingPage = () => {
             </section>
 
             {/* Stats Bar */}
-            <section className="bg-slate-900 border-y border-slate-800 py-8 px-4">
+            <section className="bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 py-8 px-4 transition-colors duration-200">
                 <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
                     {stats.map((stat, i) => (
                         <div key={i} className="text-center">
-                            <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{stat.value}</p>
-                            <p className="text-indigo-300/80 text-sm mt-1 font-medium">{stat.label}</p>
+                            <p className="text-3xl sm:text-4xl font-extrabold text-indigo-600 dark:text-white tracking-tight">{stat.value}</p>
+                            <p className="text-slate-600 dark:text-indigo-300/80 text-sm mt-1 font-medium">{stat.label}</p>
                         </div>
                     ))}
                 </div>
@@ -264,11 +264,11 @@ const LandingPage = () => {
             </section>
 
             {/* Footer */}
-            <footer className="bg-slate-900 text-slate-400 py-8 px-4">
+            <footer className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 py-8 px-4 transition-colors duration-200">
                 <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between">
                     <div className="flex items-center space-x-2 mb-4 sm:mb-0">
-                        <GraduationCap size={20} className="text-indigo-400" />
-                        <span className="text-white font-semibold">Smart SMS</span>
+                        <GraduationCap size={20} className="text-indigo-600 dark:text-indigo-400" />
+                        <span className="text-slate-900 dark:text-white font-semibold">Smart SMS</span>
                     </div>
                     <p className="text-sm">© 2026 Smart Student Management System. Built with MERN Stack.</p>
                 </div>
