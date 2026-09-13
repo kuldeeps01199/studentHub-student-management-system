@@ -302,22 +302,22 @@ const Dashboard = () => {
                         {/* Progress Bar Visualization */}
                         <div className="sm:col-span-2 space-y-4 px-2">
                             <div>
-                                <div className="flex justify-between text-xs font-bold text-slate-700 mb-1.5">
-                                    <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-emerald-500" /> Present Students</span>
-                                    <span className="text-emerald-600">{stats.presentStudents} Students ({stats.todayAttendancePct}%)</span>
+                                <div className="flex justify-between text-xs font-semibold text-slate-500 mb-1.5">
+                                    <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-emerald-400" /> Present Students</span>
+                                    <span className="text-emerald-500">{stats.presentStudents} Students ({stats.todayAttendancePct}%)</span>
                                 </div>
-                                <div className="w-full bg-slate-100 rounded-full h-3">
-                                    <div className="bg-emerald-500 h-3 rounded-full transition-all duration-500" style={{ width: `${stats.todayAttendancePct}%` }}></div>
+                                <div className="w-full bg-slate-100 rounded-full h-2.5">
+                                    <div className="bg-emerald-400 h-2.5 rounded-full transition-all duration-500" style={{ width: `${stats.todayAttendancePct}%` }}></div>
                                 </div>
                             </div>
 
                             <div>
-                                <div className="flex justify-between text-xs font-bold text-slate-700 mb-1.5">
-                                    <span className="flex items-center gap-1.5"><XCircle size={14} className="text-rose-500" /> Absent Students</span>
-                                    <span className="text-rose-600">{stats.absentStudents} Students ({stats.totalAttendanceRecords > 0 ? (100 - stats.todayAttendancePct) : 0}%)</span>
+                                <div className="flex justify-between text-xs font-semibold text-slate-500 mb-1.5">
+                                    <span className="flex items-center gap-1.5"><XCircle size={14} className="text-rose-400" /> Absent Students</span>
+                                    <span className="text-rose-400">{stats.absentStudents} Students ({stats.totalAttendanceRecords > 0 ? (100 - stats.todayAttendancePct) : 0}%)</span>
                                 </div>
-                                <div className="w-full bg-slate-100 rounded-full h-3">
-                                    <div className="bg-rose-500 h-3 rounded-full transition-all duration-500" style={{ width: `${stats.totalAttendanceRecords > 0 ? (100 - stats.todayAttendancePct) : 0}%` }}></div>
+                                <div className="w-full bg-slate-100 rounded-full h-2.5">
+                                    <div className="bg-rose-400 h-2.5 rounded-full transition-all duration-500" style={{ width: `${stats.totalAttendanceRecords > 0 ? (100 - stats.todayAttendancePct) : 0}%` }}></div>
                                 </div>
                             </div>
 
