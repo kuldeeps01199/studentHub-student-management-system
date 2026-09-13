@@ -8,7 +8,7 @@ import {
 import ProfileDrawer from './ProfileDrawer';
 
 const allNavItems = [
-    { path: '/', icon: <LayoutDashboard size={20} />, name: 'Dashboard', exact: true, roles: ['admin', 'teacher', 'student'] },
+    { path: '/', icon: <LayoutDashboard size={20} />, name: 'Dashboard', end: true, roles: ['admin', 'teacher', 'student'] },
     { path: '/profile', icon: <User size={20} />, name: 'My Profile', roles: ['student', 'teacher', 'admin'] },
     { path: '/report-card', icon: <FileText size={20} />, name: 'My Report Card', roles: ['student'] },
     { path: '/attendance/report', icon: <ClipboardList size={20} />, name: 'My Attendance', roles: ['student'] },
@@ -19,9 +19,9 @@ const allNavItems = [
     { path: '/teachers', icon: <UserCog size={20} />, name: 'Teachers', roles: ['admin'] },
     { path: '/courses', icon: <GraduationCap size={20} />, name: 'Courses', roles: ['admin'] },
     { path: '/subjects', icon: <BookOpen size={20} />, name: 'Subjects', roles: ['admin'] },
-    { path: '/attendance', icon: <ClipboardList size={20} />, name: 'Mark & Edit Attendance', roles: ['admin', 'teacher'] },
+    { path: '/attendance', icon: <ClipboardList size={20} />, name: 'Mark & Edit Attendance', end: true, roles: ['admin', 'teacher'] },
     { path: '/attendance/report', icon: <FileText size={20} />, name: 'Attendance Report', roles: ['admin', 'teacher'] },
-    { path: '/results', icon: <Award size={20} />, name: 'Manage Results', roles: ['admin', 'teacher'] },
+    { path: '/results', icon: <Award size={20} />, name: 'Manage Results', end: true, roles: ['admin', 'teacher'] },
     { path: '/results/report', icon: <FileText size={20} />, name: 'Results Report', roles: ['admin', 'teacher'] },
 ];
 
@@ -105,7 +105,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, onOpenProfile }) => {
                         <NavLink
                             key={item.name}
                             to={item.path}
-                            end={item.exact}
+                            end={item.end || item.exact}
                             onClick={() => setMobileOpen(false)}
                             className={({ isActive }) =>
                                 `flex items-center space-x-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 text-sm font-medium
