@@ -1,0 +1,209 @@
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import api from '../services/api';
+import { AuthContext } from '../context/AuthContext';
+import PublicNavbar from '../components/PublicNavbar';
+import { Eye, EyeOff } from 'lucide-react';
+
+const Signup = () => {
+    const [role, setRole] = useState('student');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [courses, setCourses] = useState([]);
+    const { login, user } = useContext(AuthContext);
+
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        password: '',
+        rollNumber: '',
+        admissionNumber: '',
+        course: '',
+        semester: '',
+        employeeId: '',
+        phone: ''
+    });
+
+    const [adminExists, setAdminExists] = useState(false);
+
+    useEffect(() => {
+        api.get('/courses')
+            .then(({ data }) => setCourses(data))
+            .catch(err => console.error('Failed to fetch courses', err));
+
+        api.get('/auth/admin-exists')
+            .then(({ data }) => setAdminExists(data.exists))
+            .catch(console.error);
+    }, []);
+
+    if (user) return <Navigate to="/" replace />;
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            const endpoint = role === 'student' 
+                ? '/auth/register-student' 
+                : role === 'teacher' 
+                ? '/auth/register-teacher' 
+                : '/auth/register-admin';
+            await api.post(endpoint, formData);
+            await login(formData.email, formData.password);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Registration failed');
+            setLoading(false);
+        }
+    };
+
+    const inputClass = "w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors";
+
+    return (
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+            <PublicNavbar />
+            <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-xl w-full bg-white p-8 sm:p-10 rounded-xl shadow-lg border border-slate-100">
+                    <div className="text-center mb-6">
+                        <Link to="/home" className="inline-block group mb-3" title="StudentHub - Go to Home">
+                            <img 
+                                src="/logo.jpg" 
+                                alt="StudentHub Logo" 
+                                className="w-16 h-16 rounded-2xl object-contain mx-auto bg-slate-50 p-1 border border-slate-200 shadow-md group-hover:scale-105 transition-transform"
+                            />
+                        </Link>
+                        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Create an account</h2>
+                        <p className="mt-1 text-xs text-slate-500 font-medium">Join StudentHub – Student Management System</p>
+                    </div>
+
+                    {/* Role Toggle */}
+                    <div className="flex justify-center space-x-3 mb-6">
+                        <button
+                            type="button"
+                            className={`flex-1 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${role === 'student' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                            onClick={() => setRole('student')}
+                        >
+                            👨‍🎓 Student Registration
+                        </button>
+                        <button
+                            type="button"
+                            className={`flex-1 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${role === 'teacher' ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                            onClick={() => setRole('teacher')}
+                        >
+                            👨‍🏫 Teacher Registration
+                        </button>
+                    </div>
+
+                    <div className="mb-5 bg-indigo-50/70 p-3 rounded-xl border border-indigo-100 text-center">
+                        <p className="text-xs text-indigo-900 font-semibold">
+                            🛡️ <strong>Admin Account?</strong> Admin accounts are protected and created internally. Please <Link to="/login" className="underline text-indigo-600 font-bold">Sign In here</Link>.
+                        </p>
+                    </div>
+
+                    {error && (
+                        <div className="mb-4 bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center border border-red-100 font-medium">
+                            {error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Common Fields */}
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Full Name *</label>
+                                <input name="fullName" required className={inputClass} value={formData.fullName} onChange={handleChange} placeholder="Enter full name" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Email Address *</label>
+                                <input name="email" type="email" required className={inputClass} value={formData.email} onChange={handleChange} placeholder="example@email.com" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Password *</label>
+                                <div className="relative">
+                                    <input 
+                                        name="password" 
+                                        type={showPassword ? 'text' : 'password'} 
+                                        required 
+                                        className={`${inputClass} pr-10`} 
+                                        value={formData.password} 
+                                        onChange={handleChange} 
+                                        placeholder="Min. 6 characters" 
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
+                                <input name="phone" className={inputClass} value={formData.phone} onChange={handleChange} placeholder="Optional" />
+                            </div>
+
+                            {/* Student Fields */}
+                            {role === 'student' && (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Roll Number *</label>
+                                        <input name="rollNumber" required className={inputClass} value={formData.rollNumber} onChange={handleChange} placeholder="e.g. CS2024001" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Admission Number *</label>
+                                        <input name="admissionNumber" required className={inputClass} value={formData.admissionNumber} onChange={handleChange} placeholder="e.g. ADM2024001" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Course *</label>
+                                        <select name="course" required className={inputClass} value={formData.course} onChange={handleChange}>
+                                            <option value="">Select Course</option>
+                                            {courses.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Semester *</label>
+                                        <select name="semester" required className={inputClass} value={formData.semester} onChange={handleChange}>
+                                            <option value="">Select Semester</option>
+                                            {[1,2,3,4,5,6,7,8].map(s => (
+                                                <option key={s} value={`Semester ${s}`}>Semester {s}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Teacher Fields */}
+                            {role === 'teacher' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Employee ID *</label>
+                                    <input name="employeeId" required className={inputClass} value={formData.employeeId} onChange={handleChange} placeholder="e.g. EMP001" />
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-2 shadow-sm"
+                        >
+                            {loading ? 'Verifying & Creating Account...' : `Register as ${role === 'student' ? 'Student' : 'Teacher'}`}
+                        </button>
+                    </form>
+
+                    <p className="text-center text-sm text-slate-500 mt-6">
+                        Already have an account?{' '}
+                        <Link to="/login" className="text-indigo-600 font-medium hover:text-indigo-500">Sign in here</Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Signup;
