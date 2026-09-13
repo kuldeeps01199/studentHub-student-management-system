@@ -1,10 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { Navigate, Outlet, Link, NavLink } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import {
     LayoutDashboard, Users, UserCog, BookOpen, User, Shield,
-    FileText, LogOut, ClipboardList, Award, GraduationCap, Menu, X, Sun, Moon
+    FileText, LogOut, ClipboardList, Award, GraduationCap, Menu, X
 } from 'lucide-react';
 import ProfileDrawer from './ProfileDrawer';
 
@@ -43,11 +42,11 @@ const Sidebar = ({ mobileOpen, setMobileOpen, onOpenProfile }) => {
                 />
             )}
 
-            <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 sm:w-72 lg:w-64 bg-gradient-to-b from-indigo-900 via-indigo-900 to-indigo-950 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-900 text-white flex flex-col h-screen transform transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none border-r dark:border-slate-800
+            <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 sm:w-72 lg:w-64 bg-gradient-to-b from-indigo-900 via-indigo-900 to-indigo-950 text-white flex flex-col h-screen transform transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none
                 ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
 
                 {/* Logo - Clickable to Home */}
-                <div className="p-4 sm:p-5 border-b border-indigo-800/80 dark:border-indigo-900/60 flex items-center justify-between">
+                <div className="p-4 sm:p-5 border-b border-indigo-800/80 flex items-center justify-between">
                     <Link 
                         to="/" 
                         onClick={() => setMobileOpen(false)}
@@ -77,7 +76,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, onOpenProfile }) => {
                 </div>
 
                 {/* User Info - Clickable to Open Full Profile Page */}
-                <div className="px-4 py-3.5 border-b border-indigo-800/80 dark:border-indigo-900/60">
+                <div className="px-4 py-3.5 border-b border-indigo-800/80">
                     <Link 
                         to="/profile"
                         onClick={() => setMobileOpen(false)}
@@ -123,7 +122,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, onOpenProfile }) => {
                 </nav>
 
                 {/* Logout */}
-                <div className="p-3.5 border-t border-indigo-800/80 dark:border-indigo-900/60">
+                <div className="p-3.5 border-t border-indigo-800/80">
                     <button
                         onClick={logout}
                         className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl hover:bg-red-500/20 w-full transition-colors text-indigo-300 hover:text-red-300 text-sm font-medium"
@@ -139,15 +138,14 @@ const Sidebar = ({ mobileOpen, setMobileOpen, onOpenProfile }) => {
 
 const Header = ({ setMobileOpen, onOpenProfile }) => {
     const { user } = useContext(AuthContext);
-    const { theme, toggleTheme } = useTheme();
 
     return (
-        <header className="bg-white dark:bg-slate-900 shadow-xs h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-20 transition-colors duration-200">
+        <header className="bg-white shadow-xs h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 sticky top-0 z-20">
             {/* Left: Mobile hamburger & Full Project Name */}
             <div className="flex items-center space-x-3 sm:space-x-4">
                 <button
                     onClick={() => setMobileOpen(prev => !prev)}
-                    className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"
+                    className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
                     aria-label="Toggle Navigation Menu"
                 >
                     <Menu size={22} />
@@ -159,7 +157,7 @@ const Header = ({ setMobileOpen, onOpenProfile }) => {
                     className="flex items-center space-x-3 group transition-transform active:scale-98"
                     title="StudentHub - Go to Home / Dashboard"
                 >
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/80 p-1 border border-indigo-100 dark:border-indigo-800 shadow-2xs flex items-center justify-center group-hover:border-indigo-300 group-hover:bg-indigo-100/60 transition-all flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50/80 p-1 border border-indigo-100 shadow-2xs flex items-center justify-center group-hover:border-indigo-300 group-hover:bg-indigo-100/60 transition-all flex-shrink-0">
                         <img 
                             src="/logo.jpg" 
                             alt="StudentHub Logo" 
@@ -168,10 +166,10 @@ const Header = ({ setMobileOpen, onOpenProfile }) => {
                     </div>
                     <div className="flex flex-col justify-center">
                         <div className="flex items-center gap-2">
-                            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-tight">
+                            <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors leading-tight">
                                 StudentHub
                             </span>
-                            <span className="hidden md:inline-block text-[10px] font-extrabold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/80 dark:border-indigo-800/80 px-2 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
+                            <span className="hidden md:inline-block text-[10px] font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
                                 Portal
                             </span>
                         </div>
@@ -182,50 +180,36 @@ const Header = ({ setMobileOpen, onOpenProfile }) => {
                 </Link>
             </div>
 
-            {/* Right: Theme Toggle, Role Badge & Profile Avatar */}
+            {/* Right: Role Badge & Profile Avatar */}
             <div className="flex items-center space-x-3">
-                {/* Theme Toggle Button */}
-                <button
-                    onClick={toggleTheme}
-                    className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all focus:outline-none"
-                    title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-                    aria-label="Toggle Theme"
-                >
-                    {theme === 'dark' ? (
-                        <Sun size={18} className="text-amber-400 animate-spin-slow" />
-                    ) : (
-                        <Moon size={18} className="text-indigo-600" />
-                    )}
-                </button>
-
                 {/* Role Pill Badge */}
-                <div className="hidden xs:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border border-transparent capitalize">
+                <div className="hidden xs:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-2xs capitalize">
                     {user?.role === 'admin' ? (
-                        <span className="flex items-center gap-1 text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 border border-purple-200/80 dark:border-purple-800/80 px-2.5 py-0.5 rounded-full">
-                            <Shield size={13} className="text-purple-600 dark:text-purple-400" /> Admin
+                        <span className="flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200/80 px-2.5 py-0.5 rounded-full">
+                            <Shield size={13} className="text-purple-600" /> Admin
                         </span>
                     ) : user?.role === 'teacher' ? (
-                        <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/80 px-2.5 py-0.5 rounded-full">
-                            <UserCog size={13} className="text-emerald-600 dark:text-emerald-400" /> Teacher
+                        <span className="flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full">
+                            <UserCog size={13} className="text-emerald-600" /> Teacher
                         </span>
                     ) : (
-                        <span className="flex items-center gap-1 text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/80 px-2.5 py-0.5 rounded-full">
-                            <GraduationCap size={13} className="text-indigo-600 dark:text-indigo-400" /> Student
+                        <span className="flex items-center gap-1 text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-2.5 py-0.5 rounded-full">
+                            <GraduationCap size={13} className="text-indigo-600" /> Student
                         </span>
                     )}
                 </div>
 
                 <button
                     onClick={onOpenProfile}
-                    className="relative group p-1 rounded-full hover:ring-4 hover:ring-indigo-100 dark:hover:ring-indigo-950 transition-all focus:outline-none"
+                    className="relative group p-1 rounded-full hover:ring-4 hover:ring-indigo-100 transition-all focus:outline-none"
                     title="Open Profile Settings"
                     aria-label="User Profile"
                 >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-700 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-indigo-200 dark:ring-indigo-800 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-700 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-indigo-200 group-hover:scale-105 transition-transform">
                         {user?.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     {/* Status green dot */}
-                    <span className="absolute bottom-1 right-1 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+                    <span className="absolute bottom-1 right-1 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
                 </button>
             </div>
         </header>
@@ -238,10 +222,10 @@ const Layout = () => {
     const [profileOpen, setProfileOpen] = useState(false);
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
             <div className="flex flex-col items-center space-y-4">
                 <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Loading portal...</p>
+                <p className="text-slate-500 text-sm font-medium">Loading portal...</p>
             </div>
         </div>
     );
@@ -251,7 +235,7 @@ const Layout = () => {
     }
 
     return (
-        <div className="flex h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden transition-colors duration-200">
+        <div className="flex h-screen bg-slate-50 overflow-hidden">
             {/* Sidebar */}
             <Sidebar 
                 mobileOpen={mobileOpen} 
@@ -265,7 +249,7 @@ const Layout = () => {
                     setMobileOpen={setMobileOpen} 
                     onOpenProfile={() => setProfileOpen(true)}
                 />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
                     <Outlet />
                 </main>
             </div>

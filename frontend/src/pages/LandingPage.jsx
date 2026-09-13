@@ -110,20 +110,20 @@ const LandingPage = () => {
             <PublicNavbar />
 
             {/* Hero Section */}
-            <section className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-indigo-900 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-900 text-white py-24 px-4 relative overflow-hidden transition-colors duration-200">
+            <section className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900 text-white py-24 px-4 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:16px_16px]"></div>
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <div className="inline-flex items-center space-x-2 bg-white/10 dark:bg-indigo-500/10 text-indigo-100 dark:text-indigo-300 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/20 dark:border-indigo-500/20 backdrop-blur-sm">
-                        <Zap size={14} className="text-amber-300 dark:text-indigo-400 animate-pulse" />
+                    <div className="inline-flex items-center space-x-2 bg-indigo-700/50 text-indigo-200 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-indigo-600">
+                        <Zap size={14} className="text-amber-300 animate-pulse" />
                         <span>Fully Digital · Real-time · MongoDB Powered</span>
                     </div>
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
                         The Smart Way to Manage
-                        <span className="bg-gradient-to-r from-indigo-200 via-white to-indigo-200 dark:from-indigo-300 dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent block mt-1">
+                        <span className="text-indigo-300 block mt-1">
                             Your Institution
                         </span>
                     </h1>
-                    <p className="text-lg sm:text-xl text-indigo-100/90 dark:text-indigo-200/90 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
+                    <p className="text-lg sm:text-xl text-indigo-200 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
                         Replace paper registers and complex spreadsheets with a modern, centralized platform
                         for students, teachers, attendance, results, and administrative oversight.
                     </p>
@@ -132,7 +132,7 @@ const LandingPage = () => {
                             <span>Get Started Free</span>
                             <ArrowRight size={20} />
                         </Link>
-                        <Link to="/login" className="border border-white/40 dark:border-indigo-400/40 text-white dark:text-indigo-100 hover:bg-white/10 px-8 py-3.5 rounded-xl font-semibold transition-all duration-200 backdrop-blur-sm text-lg">
+                        <Link to="/login" className="border border-indigo-400 text-indigo-100 hover:bg-indigo-700/50 px-8 py-3.5 rounded-xl font-semibold transition-all duration-200 text-lg">
                             Sign In
                         </Link>
                     </div>
@@ -140,28 +140,28 @@ const LandingPage = () => {
             </section>
 
             {/* Stats Bar */}
-            <section className="bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 py-8 px-4 transition-colors duration-200">
+            <section className="bg-indigo-950 py-8 px-4">
                 <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
                     {stats.map((stat, i) => (
                         <div key={i} className="text-center">
-                            <p className="text-3xl sm:text-4xl font-extrabold text-indigo-600 dark:text-white tracking-tight">{stat.value}</p>
-                            <p className="text-slate-600 dark:text-indigo-300/80 text-sm mt-1 font-medium">{stat.label}</p>
+                            <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{stat.value}</p>
+                            <p className="text-indigo-300 text-sm mt-1 font-medium">{stat.label}</p>
                         </div>
                     ))}
                 </div>
             </section>
 
             {/* Features */}
-            <section className="py-24 px-4 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200">
+            <section className="py-24 px-4 bg-slate-50">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
-                        <span className="text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-widest bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-100 dark:border-indigo-800/80 px-3.5 py-1.5 rounded-full inline-block mb-3 shadow-xs">
+                        <span className="text-indigo-600 font-semibold text-xs uppercase tracking-widest bg-indigo-50 border border-indigo-100 px-3.5 py-1.5 rounded-full inline-block mb-3 shadow-xs">
                             Powerful Modules
                         </span>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-4">
                             Everything You Need
                         </h2>
-                        <p className="text-slate-600 dark:text-slate-400 max-w-xl mx-auto text-base">
+                        <p className="text-slate-600 max-w-xl mx-auto text-base">
                             One comprehensive platform designed to streamline every operation across your institution.
                         </p>
                     </div>
@@ -169,19 +169,19 @@ const LandingPage = () => {
                         {features.map((feat, i) => (
                             <div
                                 key={i}
-                                className="group bg-white dark:bg-slate-900/90 rounded-2xl p-7 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-300 dark:hover:border-indigo-500/40 dark:hover:bg-slate-900 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.01] relative overflow-hidden cursor-pointer"
+                                className="group bg-white rounded-2xl p-7 border border-slate-200/80 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-300 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.01] relative overflow-hidden cursor-pointer"
                             >
                                 {/* Top animated gradient accent line */}
                                 <div className="absolute top-0 left-0 w-0 group-hover:w-full h-1 bg-gradient-to-r from-indigo-500 via-indigo-400 to-indigo-600 transition-all duration-500 ease-out" />
                                 
-                                <div className={`w-13 h-13 rounded-2xl flex items-center justify-center mb-5 border ${feat.bg} dark:bg-slate-800/90 dark:border-slate-700/80 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 shadow-xs`}>
+                                <div className={`w-13 h-13 rounded-2xl flex items-center justify-center mb-5 border ${feat.bg} transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 shadow-xs`}>
                                     {feat.icon}
                                 </div>
-                                <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center justify-between">
+                                <h3 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-indigo-600 transition-colors flex items-center justify-between">
                                     <span>{feat.title}</span>
-                                    <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 text-indigo-600 dark:text-indigo-400" />
+                                    <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 text-indigo-600" />
                                 </h3>
-                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                <p className="text-slate-600 text-sm leading-relaxed">
                                     {feat.desc}
                                 </p>
                             </div>
@@ -191,16 +191,16 @@ const LandingPage = () => {
             </section>
 
             {/* Role-Based Access Cards */}
-            <section className="py-24 px-4 bg-white dark:bg-[#0f172a] border-t border-slate-200/60 dark:border-slate-800 transition-colors duration-200">
+            <section className="py-24 px-4 bg-white border-t border-slate-200/60">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
-                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-xs uppercase tracking-widest bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-100 dark:border-emerald-800/80 px-3.5 py-1.5 rounded-full inline-block mb-3 shadow-xs">
+                        <span className="text-emerald-600 font-semibold text-xs uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full inline-block mb-3 shadow-xs">
                             Tailored Experience
                         </span>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-4">
                             Built for Everyone
                         </h2>
-                        <p className="text-slate-600 dark:text-slate-400 max-w-lg mx-auto text-base">
+                        <p className="text-slate-600 max-w-lg mx-auto text-base">
                             Dedicated views and permissions custom-tailored for each stakeholder.
                         </p>
                     </div>
@@ -209,7 +209,7 @@ const LandingPage = () => {
                         {roleCards.map((card, i) => (
                             <div
                                 key={i}
-                                className={`group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl ${card.glowColor} ${card.borderColor} transition-all duration-300 hover:-translate-y-2 hover:scale-[1.015] flex flex-col cursor-pointer`}
+                                className={`group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-2xl ${card.glowColor} ${card.borderColor} transition-all duration-300 hover:-translate-y-2 hover:scale-[1.015] flex flex-col cursor-pointer`}
                             >
                                 {/* Header */}
                                 <div className={`bg-gradient-to-br ${card.gradient} p-7 text-white relative overflow-hidden`}>
@@ -230,17 +230,17 @@ const LandingPage = () => {
                                 </div>
 
                                 {/* Body */}
-                                <div className="p-7 bg-white dark:bg-slate-900 flex-1 flex flex-col justify-between space-y-4 group-hover:bg-slate-50/60 dark:group-hover:bg-slate-800/40 transition-colors duration-300">
+                                <div className="p-7 bg-white flex-1 flex flex-col justify-between space-y-4 group-hover:bg-slate-50/60 transition-colors duration-300">
                                     <div className="space-y-2.5">
                                         {card.points.map((pt, j) => (
                                             <div
                                                 key={j}
-                                                className="flex items-start space-x-3 text-slate-700 dark:text-slate-300 text-sm leading-snug p-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800 transition-colors duration-150"
+                                                className="flex items-start space-x-3 text-slate-700 text-sm leading-snug p-1.5 rounded-xl hover:bg-slate-100/80 transition-colors duration-150"
                                             >
-                                                <div className={`p-1 rounded-full ${card.checkBg} dark:bg-slate-800 dark:text-indigo-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
+                                                <div className={`p-1 rounded-full ${card.checkBg} mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
                                                     <Check size={13} strokeWidth={3} />
                                                 </div>
-                                                <span className="font-medium text-slate-700 dark:text-slate-200">{pt}</span>
+                                                <span className="font-medium text-slate-700">{pt}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -252,10 +252,10 @@ const LandingPage = () => {
             </section>
 
             {/* CTA */}
-            <section className="bg-indigo-600 dark:bg-gradient-to-r dark:from-indigo-950 dark:via-slate-900 dark:to-indigo-950 py-16 px-4 border-t border-indigo-500/20">
+            <section className="bg-indigo-600 py-16 px-4">
                 <div className="max-w-2xl mx-auto text-center">
                     <h2 className="text-3xl font-bold text-white mb-4">Ready to get started?</h2>
-                    <p className="text-indigo-100 dark:text-indigo-200 mb-8">Join your institution's digital management system today.</p>
+                    <p className="text-indigo-100 mb-8">Join your institution's digital management system today.</p>
                     <Link to="/signup" className="bg-white text-indigo-700 hover:bg-indigo-50 px-10 py-3.5 rounded-xl font-semibold inline-flex items-center space-x-2 transition-all text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                         <span>Register Now</span>
                         <ArrowRight size={20} />
@@ -264,11 +264,11 @@ const LandingPage = () => {
             </section>
 
             {/* Footer */}
-            <footer className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 py-8 px-4 transition-colors duration-200">
+            <footer className="bg-slate-900 text-slate-400 py-8 px-4">
                 <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between">
                     <div className="flex items-center space-x-2 mb-4 sm:mb-0">
-                        <GraduationCap size={20} className="text-indigo-600 dark:text-indigo-400" />
-                        <span className="text-slate-900 dark:text-white font-semibold">Smart SMS</span>
+                        <GraduationCap size={20} className="text-indigo-400" />
+                        <span className="text-white font-semibold">Smart SMS</span>
                     </div>
                     <p className="text-sm">© 2026 Smart Student Management System. Built with MERN Stack.</p>
                 </div>
