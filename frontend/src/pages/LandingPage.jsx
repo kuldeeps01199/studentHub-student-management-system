@@ -152,7 +152,7 @@ const LandingPage = () => {
             </section>
 
             {/* Features */}
-            <section className="py-24 px-4 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+            <section className="py-24 px-4 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <span className="text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-widest bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-100 dark:border-indigo-800/80 px-3.5 py-1.5 rounded-full inline-block mb-3 shadow-xs">
@@ -169,12 +169,12 @@ const LandingPage = () => {
                         {features.map((feat, i) => (
                             <div
                                 key={i}
-                                className="group bg-white dark:bg-slate-900 rounded-2xl p-7 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.01] relative overflow-hidden cursor-pointer"
+                                className="group bg-white dark:bg-slate-900/90 rounded-2xl p-7 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-300 dark:hover:border-indigo-500/40 dark:hover:bg-slate-900 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.01] relative overflow-hidden cursor-pointer"
                             >
                                 {/* Top animated gradient accent line */}
                                 <div className="absolute top-0 left-0 w-0 group-hover:w-full h-1 bg-gradient-to-r from-indigo-500 via-indigo-400 to-indigo-600 transition-all duration-500 ease-out" />
                                 
-                                <div className={`w-13 h-13 rounded-2xl flex items-center justify-center mb-5 border ${feat.bg} dark:bg-slate-800 dark:border-slate-700 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 shadow-xs`}>
+                                <div className={`w-13 h-13 rounded-2xl flex items-center justify-center mb-5 border ${feat.bg} dark:bg-slate-800/90 dark:border-slate-700/80 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 shadow-xs`}>
                                     {feat.icon}
                                 </div>
                                 <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center justify-between">
@@ -191,7 +191,7 @@ const LandingPage = () => {
             </section>
 
             {/* Role-Based Access Cards */}
-            <section className="py-24 px-4 bg-white dark:bg-slate-900 border-t border-slate-200/60 dark:border-slate-800 transition-colors duration-200">
+            <section className="py-24 px-4 bg-white dark:bg-[#0f172a] border-t border-slate-200/60 dark:border-slate-800 transition-colors duration-200">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-xs uppercase tracking-widest bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-100 dark:border-emerald-800/80 px-3.5 py-1.5 rounded-full inline-block mb-3 shadow-xs">
@@ -209,7 +209,7 @@ const LandingPage = () => {
                         {roleCards.map((card, i) => (
                             <div
                                 key={i}
-                                className={`group bg-white dark:bg-slate-950 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl ${card.glowColor} ${card.borderColor} transition-all duration-300 hover:-translate-y-2 hover:scale-[1.015] flex flex-col cursor-pointer`}
+                                className={`group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl ${card.glowColor} ${card.borderColor} transition-all duration-300 hover:-translate-y-2 hover:scale-[1.015] flex flex-col cursor-pointer`}
                             >
                                 {/* Header */}
                                 <div className={`bg-gradient-to-br ${card.gradient} p-7 text-white relative overflow-hidden`}>
@@ -230,17 +230,17 @@ const LandingPage = () => {
                                 </div>
 
                                 {/* Body */}
-                                <div className="p-7 bg-white dark:bg-slate-950 flex-1 flex flex-col justify-between space-y-4 group-hover:bg-slate-50/60 dark:group-hover:bg-slate-900/60 transition-colors duration-300">
+                                <div className="p-7 bg-white dark:bg-slate-900 flex-1 flex flex-col justify-between space-y-4 group-hover:bg-slate-50/60 dark:group-hover:bg-slate-800/40 transition-colors duration-300">
                                     <div className="space-y-2.5">
                                         {card.points.map((pt, j) => (
                                             <div
                                                 key={j}
-                                                className="flex items-start space-x-3 text-slate-700 dark:text-slate-300 text-sm leading-snug p-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors duration-150"
+                                                className="flex items-start space-x-3 text-slate-700 dark:text-slate-300 text-sm leading-snug p-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800 transition-colors duration-150"
                                             >
                                                 <div className={`p-1 rounded-full ${card.checkBg} dark:bg-slate-800 dark:text-indigo-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
                                                     <Check size={13} strokeWidth={3} />
                                                 </div>
-                                                <span className="font-medium text-slate-700 dark:text-slate-300">{pt}</span>
+                                                <span className="font-medium text-slate-700 dark:text-slate-200">{pt}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -252,11 +252,11 @@ const LandingPage = () => {
             </section>
 
             {/* CTA */}
-            <section className="bg-indigo-600 py-16 px-4">
+            <section className="bg-indigo-600 dark:bg-gradient-to-r dark:from-indigo-950 dark:via-slate-900 dark:to-indigo-950 py-16 px-4 border-t border-indigo-500/20">
                 <div className="max-w-2xl mx-auto text-center">
                     <h2 className="text-3xl font-bold text-white mb-4">Ready to get started?</h2>
-                    <p className="text-indigo-100 mb-8">Join your institution's digital management system today.</p>
-                    <Link to="/signup" className="bg-white text-indigo-700 hover:bg-indigo-50 px-10 py-3.5 rounded-lg font-semibold inline-flex items-center space-x-2 transition-colors text-lg shadow-lg">
+                    <p className="text-indigo-100 dark:text-indigo-200 mb-8">Join your institution's digital management system today.</p>
+                    <Link to="/signup" className="bg-white text-indigo-700 hover:bg-indigo-50 px-10 py-3.5 rounded-xl font-semibold inline-flex items-center space-x-2 transition-all text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                         <span>Register Now</span>
                         <ArrowRight size={20} />
                     </Link>
