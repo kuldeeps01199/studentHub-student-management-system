@@ -82,7 +82,7 @@ Create a `.env` file inside `backend/`:
 ```env
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/student_management
-JWT_SECRET=supersecretjwtkey_12345
+JWT_SECRET=jwtkey_12345
 NODE_ENV=development
 ```
 
