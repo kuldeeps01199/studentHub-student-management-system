@@ -82,7 +82,7 @@ const sendSignupOTP = async (req, res) => {
 
         await sendEmail({
             email: normalizedEmail,
-            subject: 'StudentHub - Account Registration Verification Code',
+            subject: `StudentHub Verification Code: ${otp}`,
             message: messageText
         });
 
@@ -327,7 +327,7 @@ const sendOTP = async (req, res) => {
 
         await sendEmail({
             email: user.email,
-            subject: 'StudentHub - Password Reset OTP Code',
+            subject: `StudentHub Password Reset Code: ${otp}`,
             message: messageText
         });
 
