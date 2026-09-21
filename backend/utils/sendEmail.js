@@ -18,7 +18,8 @@ const sendEmail = async (options) => {
             console.log(`[Brevo API] OTP Email successfully dispatched to ${options.email}`);
             return;
         } catch (err) {
-            console.error(`[Brevo API Error] ${err.message}. Trying Gmail SMTP...`);
+            console.error(`[Brevo API Error] ${err.message}`);
+            throw new Error(`Email dispatch failed: ${err.message}`);
         }
     }
 
@@ -51,8 +52,8 @@ const sendEmail = async (options) => {
         await transporter.sendMail(message);
         console.log(`[Gmail SMTP] OTP Email successfully dispatched to ${options.email}`);
     } catch (err) {
-        console.error(`[SMTP Notice] Email delivery attempt: ${err.message}. Target: ${options.email}`);
-        // Log notice so registration flow continues smoothly
+        console.error(`[SMTP Error] Failed to send email to ${options.email}:`, err.message);
+        throw new Error(`Failed to send email: ${err.message}`);
     }
 };
 

@@ -87,9 +87,9 @@ const sendSignupOTP = async (req, res) => {
         });
 
         res.json({
-            message: `Verification OTP dispatched to ${normalizedEmail}! Check email or use instant code below.`,
+            message: `Verification OTP sent to ${normalizedEmail}. Please check your email inbox!`,
             otpSent: true,
-            debugOTP: otp
+            debugOTP: process.env.NODE_ENV !== 'production' ? otp : undefined
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -332,9 +332,9 @@ const sendOTP = async (req, res) => {
         });
 
         res.json({ 
-            message: `OTP dispatched to ${user.email}! Check email or use instant code below.`,
+            message: `OTP sent successfully to ${user.email}. Please check your email inbox!`,
             otpSent: true,
-            debugOTP: otp
+            debugOTP: process.env.NODE_ENV !== 'production' ? otp : undefined
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
