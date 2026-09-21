@@ -1,70 +1,44 @@
 const nodemailer = require('nodemailer');
 
+/**
+ * Dispatches emails (OTP verification, password reset, etc.)
+ * Uses Gmail SMTP by default which sends to ANY recipient email address without domain restrictions.
+ */
 const sendEmail = async (options) => {
+    const emailUser = process.env.EMAIL_USER || 'kuldeepsingh011999@gmail.com';
+    const emailPass = process.env.EMAIL_PASS || 'qwht drff vrgc vkew';
 
-    // Method 1: Gmail SMTP (Port 465 SSL with forced IPv4)
-    // Allows sending emails to ANY student/recipient email address without domain restrictions!
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        try {
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
-                family: 4,
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
-                },
-                tls: {
-                    rejectUnauthorized: false,
-                },
-            });
-
-            const message = {
-                from: `"${process.env.FROM_NAME || 'StudentHub System'}" <${process.env.EMAIL_USER}>`,
-                to: options.email,
-                subject: options.subject,
-                text: options.message,
-                html: options.html || buildHtmlTemplate(options.message),
-            };
-
-            await transporter.sendMail(message);
-            console.log(`[Gmail SMTP] OTP Email successfully dispatched to ${options.email}`);
-            return;
-        } catch (err) {
-            console.error(`[Gmail SMTP Error] ${err.message}. Trying Resend fallback...`);
-            // If Gmail SMTP fails, proceed to try Resend API fallback below
-        }
+    if (!emailUser || !emailPass) {
+        throw new Error('Email server is not configured. Please set EMAIL_USER and EMAIL_PASS in environment settings.');
     }
 
-    // Method 2: Resend API Fallback
-    if (process.env.RESEND_API_KEY) {
-        try {
-            const { Resend } = require('resend');
-            const resend = new Resend(process.env.RESEND_API_KEY);
-
-            const { data, error } = await resend.emails.send({
-                from: `${process.env.FROM_NAME || 'StudentHub'} <onboarding@resend.dev>`,
-                to: [options.email],
-                subject: options.subject,
-                text: options.message,
-                html: options.html || buildHtmlTemplate(options.message),
-            });
-
-            if (error) {
-                console.error(`[Resend Error]`, error);
-                throw new Error(error.message);
-            }
-
-            console.log(`[Resend] Email successfully sent to ${options.email} (ID: ${data?.id})`);
-            return;
-        } catch (err) {
-            console.error(`[Resend Error] ${err.message}`);
-            throw new Error(`Failed to send email: ${err.message}`);
+    // Gmail SMTP Configuration — sends to ANY student or recipient address
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: emailUser,
+            pass: emailPass,
+        },
+        tls: {
+            rejectUnauthorized: false
         }
-    }
+    });
 
-    console.log(`[Email Notice] No working email credentials configured. Check EMAIL_USER/EMAIL_PASS.`);
+    const message = {
+        from: `"${process.env.FROM_NAME || 'StudentHub System'}" <${emailUser}>`,
+        to: options.email,
+        subject: options.subject,
+        text: options.message,
+        html: options.html || buildHtmlTemplate(options.message),
+    };
+
+    try {
+        await transporter.sendMail(message);
+        console.log(`[Gmail SMTP] OTP Email successfully dispatched to ${options.email}`);
+    } catch (err) {
+        console.error(`[Gmail SMTP Error] Failed to send email to ${options.email}:`, err.message);
+        throw new Error(`Failed to send email: ${err.message}`);
+    }
 };
 
 function buildHtmlTemplate(messageText) {
