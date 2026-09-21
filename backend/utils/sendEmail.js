@@ -1,10 +1,43 @@
 const nodemailer = require('nodemailer');
 
-// Try Resend API first (works on Render/Vercel/Railway where SMTP is blocked)
-// Falls back to Gmail SMTP for local development
 const sendEmail = async (options) => {
 
-    // Method 1: Resend HTTP API (recommended for cloud hosting)
+    // Method 1: Gmail SMTP (Port 465 SSL with forced IPv4)
+    // Allows sending emails to ANY student/recipient email address without domain restrictions!
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        try {
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                family: 4,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+                tls: {
+                    rejectUnauthorized: false,
+                },
+            });
+
+            const message = {
+                from: `"${process.env.FROM_NAME || 'StudentHub System'}" <${process.env.EMAIL_USER}>`,
+                to: options.email,
+                subject: options.subject,
+                text: options.message,
+                html: options.html || buildHtmlTemplate(options.message),
+            };
+
+            await transporter.sendMail(message);
+            console.log(`[Gmail SMTP] OTP Email successfully dispatched to ${options.email}`);
+            return;
+        } catch (err) {
+            console.error(`[Gmail SMTP Error] ${err.message}. Trying Resend fallback...`);
+            // If Gmail SMTP fails, proceed to try Resend API fallback below
+        }
+    }
+
+    // Method 2: Resend API Fallback
     if (process.env.RESEND_API_KEY) {
         try {
             const { Resend } = require('resend');
@@ -31,42 +64,7 @@ const sendEmail = async (options) => {
         }
     }
 
-    // Method 2: Gmail SMTP (for local development)
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            family: 4,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-            tls: {
-                rejectUnauthorized: false,
-            },
-        });
-
-        const message = {
-            from: `"${process.env.FROM_NAME || 'StudentHub System'}" <${process.env.EMAIL_USER}>`,
-            to: options.email,
-            subject: options.subject,
-            text: options.message,
-            html: options.html || buildHtmlTemplate(options.message),
-        };
-
-        try {
-            await transporter.sendMail(message);
-            console.log(`[SMTP] Email successfully dispatched to ${options.email}`);
-            return;
-        } catch (err) {
-            console.error(`[SMTP Error] ${err.message}`);
-            throw new Error(`Failed to send email: ${err.message}`);
-        }
-    }
-
-    // No email service configured
-    console.log(`[Email] No email service configured. Set RESEND_API_KEY or EMAIL_USER/EMAIL_PASS.`);
+    console.log(`[Email Notice] No working email credentials configured. Check EMAIL_USER/EMAIL_PASS.`);
 };
 
 function buildHtmlTemplate(messageText) {
