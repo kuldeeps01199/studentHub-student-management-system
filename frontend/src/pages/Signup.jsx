@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import PublicNavbar from '../components/PublicNavbar';
+import OtpInput from '../components/OtpInput';
 import { Eye, EyeOff, Mail, CheckCircle, ShieldAlert } from 'lucide-react';
 
 const Signup = () => {
@@ -197,24 +198,15 @@ const Signup = () => {
                                 </div>
                             </div>
 
-                            {/* OTP Code Field */}
+                            {/* Modern 6-Digit OTP Code Pin Field */}
                             {otpSent && (
-                                <div className="md:col-span-2 bg-indigo-50/60 p-4 rounded-xl border border-indigo-200 space-y-2">
-                                    <label className="block text-xs font-bold text-indigo-900 uppercase tracking-wider">
-                                        Enter 6-Digit Email Verification OTP *
-                                    </label>
-                                    <input 
-                                        type="text"
-                                        required
-                                        maxLength="6"
-                                        placeholder="Enter 6-digit code received in email"
-                                        className="w-full px-4 py-2.5 bg-white border border-indigo-300 rounded-lg text-base font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value)}
+                                <div className="md:col-span-2">
+                                    <OtpInput
+                                        email={formData.email}
+                                        onOtpChange={(code) => setOtp(code)}
+                                        onResend={handleSendOTP}
+                                        sending={sendingOtp}
                                     />
-                                    <p className="text-[11px] text-indigo-600 text-center font-medium">
-                                        OTP valid for 10 minutes. Sent to {formData.email}
-                                    </p>
                                 </div>
                             )}
 

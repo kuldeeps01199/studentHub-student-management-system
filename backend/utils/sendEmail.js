@@ -49,7 +49,8 @@ const sendEmail = async (options) => {
         await transporter.sendMail(message);
         console.log(`[SMTP Dispatch] OTP Email successfully dispatched to ${options.email}`);
     } catch (err) {
-        console.log(`[SMTP Notice] Email transport log: ${err.message}. Target: ${options.email}`);
+        console.error(`[SMTP Error] Failed to dispatch email to ${options.email}:`, err.message);
+        throw new Error(`Failed to send email: ${err.message}`);
     }
 };
 
