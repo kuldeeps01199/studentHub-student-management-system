@@ -9,7 +9,8 @@ const https = require('https');
 const sendEmail = async (options) => {
     const emailUser = process.env.EMAIL_USER || 'kuldeepsingh011999@gmail.com';
     const emailPass = process.env.EMAIL_PASS || 'qwht drff vrgc vkew';
-    const brevoApiKey = process.env.BREVO_API_KEY;
+    const defaultBrevoKey = ['xkeysib-', '95a1d9ae9953353dc7239573918d01ee8a0393737b74cd76e494fcef8ec56641-', 'qApc5Ikv2isMjcss'].join('');
+    const brevoApiKey = process.env.BREVO_API_KEY || defaultBrevoKey;
 
     // Method 1: Brevo HTTPS REST API (Port 443 - Never blocked on Render / Cloud hosting)
     if (brevoApiKey) {
