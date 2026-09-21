@@ -75,7 +75,7 @@ const sendSignupOTP = async (req, res) => {
         await SignupOTP.findOneAndUpdate(
             { email: normalizedEmail },
             { otp, expiresAt },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: 'after' }
         );
 
         const messageText = `Your One-Time Password (OTP) for StudentHub account registration is: ${otp}. This code is valid for 10 minutes. Do not share this OTP with anyone.`;
