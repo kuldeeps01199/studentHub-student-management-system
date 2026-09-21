@@ -4,6 +4,13 @@ A complete, production-ready **StudentHub – Student Management System** built 
 
 ---
 
+## 🔗 Live Demo & Links
+
+- 🌐 **Live Application URL**: [https://studenthub-student-management-system.onrender.com](https://studenthub-student-management-system.onrender.com/)
+- 📦 **GitHub Repository**: [https://github.com/kuldeeps01199/studentHub-student-management-system](https://github.com/kuldeeps01199/studentHub-student-management-system)
+
+---
+
 ## 🚀 Key Features & Deliverables
 
 ### 🔐 1. Authentication & Security
