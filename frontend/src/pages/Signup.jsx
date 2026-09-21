@@ -188,8 +188,9 @@ const Signup = () => {
                     )}
 
                     {debugOtp && (
-                        <div className="mb-4 p-2.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-mono text-center">
-                            💡 <strong>Dev Registration OTP Code:</strong> {debugOtp}
+                        <div className="mb-4 p-3 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl text-xs font-semibold text-center shadow-xs flex items-center justify-center gap-2">
+                            <span className="text-base">🔑</span>
+                            <span><strong>Instant Verification Code:</strong> <code className="bg-amber-200/80 px-2 py-0.5 rounded text-amber-950 font-bold text-sm tracking-widest">{debugOtp}</code></span>
                         </div>
                     )}
 
