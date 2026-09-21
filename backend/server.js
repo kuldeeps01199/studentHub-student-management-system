@@ -65,3 +65,19 @@ app.listen(
     PORT,
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
 );
+
+// Keep-Alive Self-Ping Heartbeat to prevent Render Free Tier from sleeping (every 14 mins)
+const https = require('https');
+const http = require('http');
+
+setInterval(() => {
+    const liveUrl = process.env.LIVE_SITE_URL || 'https://studenthub-student-management-system.onrender.com/api/auth/admin-exists';
+    if (liveUrl) {
+        const client = liveUrl.startsWith('https') ? https : http;
+        client.get(liveUrl, (res) => {
+            console.log(`[Keep-Alive Heartbeat] Server pinged successfully (${res.statusCode}) - Sleep prevented.`);
+        }).on('error', (err) => {
+            console.log(`[Keep-Alive Heartbeat] Notice: ${err.message}`);
+        });
+    }
+}, 14 * 60 * 1000); // 14 minutes
