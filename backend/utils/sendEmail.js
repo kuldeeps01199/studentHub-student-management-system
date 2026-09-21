@@ -1,8 +1,9 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 
 /**
  * Dispatches emails (OTP verification, password reset, etc.)
- * Uses Gmail SMTP by default which sends to ANY recipient email address without domain restrictions.
+ * Uses Gmail SMTP with forced IPv4 DNS lookup to prevent ENETUNREACH IPv6 errors on cloud platforms like Render.
  */
 const sendEmail = async (options) => {
     const emailUser = process.env.EMAIL_USER || 'kuldeepsingh011999@gmail.com';
@@ -12,15 +13,21 @@ const sendEmail = async (options) => {
         throw new Error('Email server is not configured. Please set EMAIL_USER and EMAIL_PASS in environment settings.');
     }
 
-    // Gmail SMTP Configuration — sends to ANY student or recipient address
+    // Gmail SMTP Configuration — Forced IPv4 DNS lookup (prevents ENETUNREACH IPv6 errors on Render)
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
             user: emailUser,
             pass: emailPass,
         },
         tls: {
-            rejectUnauthorized: false
+            rejectUnauthorized: false,
+        },
+        // Custom DNS lookup to strictly return IPv4 addresses only (family: 4)
+        lookup: (hostname, options, callback) => {
+            dns.lookup(hostname, { family: 4 }, callback);
         }
     });
 
