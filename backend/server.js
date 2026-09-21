@@ -31,6 +31,8 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const resultRoutes = require('./routes/resultRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
 
+const path = require('path');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/students', studentRoutes);
@@ -41,9 +43,21 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/notices', noticeRoutes);
 
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
+// Serve frontend static build assets in production if hosted together
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+const fs = require('fs');
+if (fs.existsSync(frontendDistPath)) {
+    app.use(express.static(frontendDistPath));
+    app.get('*', (req, res) => {
+        if (!req.path.startsWith('/api')) {
+            res.sendFile(path.resolve(frontendDistPath, 'index.html'));
+        }
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.send('StudentHub API is running...');
+    });
+}
 
 const PORT = process.env.PORT || 5000;
 
