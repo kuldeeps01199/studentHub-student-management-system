@@ -96,6 +96,33 @@ const sendSignupOTP = async (req, res) => {
     }
 };
 
+// @desc    Verify Signup OTP code standalone
+// @route   POST /api/auth/verify-signup-otp
+// @access  Public
+const verifySignupOTP = async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+        if (!email || !otp) {
+            return res.status(400).json({ message: 'Email address and 6-digit OTP code are required.' });
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+        const signupOTPRecord = await SignupOTP.findOne({ email: normalizedEmail });
+
+        if (!signupOTPRecord || signupOTPRecord.expiresAt < Date.now()) {
+            return res.status(400).json({ message: 'Verification OTP has expired or does not exist. Please request a new OTP.' });
+        }
+
+        if (signupOTPRecord.otp !== String(otp).trim()) {
+            return res.status(400).json({ message: 'Invalid OTP code. Please check your email and try again.' });
+        }
+
+        res.json({ message: 'Email address verified successfully!', verified: true });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Register a new admin
 // @route   POST /api/auth/register-admin
 // @access  Public
@@ -452,6 +479,7 @@ module.exports = {
     authUser,
     checkAdminExists,
     sendSignupOTP,
+    verifySignupOTP,
     registerAdmin,
     registerStudent,
     registerTeacher,

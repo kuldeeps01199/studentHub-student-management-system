@@ -17,8 +17,10 @@ const Signup = () => {
 
     // Signup OTP States
     const [otpSent, setOtpSent] = useState(false);
+    const [otpVerified, setOtpVerified] = useState(false);
     const [otp, setOtp] = useState('');
     const [sendingOtp, setSendingOtp] = useState(false);
+    const [verifyingOtp, setVerifyingOtp] = useState(false);
     const [debugOtp, setDebugOtp] = useState('');
 
     const [formData, setFormData] = useState({
@@ -65,12 +67,37 @@ const Signup = () => {
                 role
             });
             setOtpSent(true);
+            setOtpVerified(false);
             setSuccessMsg(data.message || `Verification OTP sent to ${formData.email}`);
             if (data.debugOTP) setDebugOtp(data.debugOTP);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to send verification OTP.');
         } finally {
             setSendingOtp(false);
+        }
+    };
+
+    const handleVerifyOTP = async () => {
+        setError('');
+        setSuccessMsg('');
+
+        if (!otp || otp.trim().length !== 6) {
+            setError('Please enter the complete 6-digit OTP code.');
+            return;
+        }
+
+        setVerifyingOtp(true);
+        try {
+            await api.post('/auth/verify-signup-otp', {
+                email: formData.email.trim(),
+                otp: otp.trim()
+            });
+            setOtpVerified(true);
+            setSuccessMsg('✅ Email verified successfully! Now fill the details below to complete registration.');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Invalid or expired OTP code. Please check and try again.');
+        } finally {
+            setVerifyingOtp(false);
         }
     };
 
@@ -84,8 +111,8 @@ const Signup = () => {
             return;
         }
 
-        if (!otp || otp.trim().length !== 6) {
-            setError('Please enter the complete 6-digit OTP code sent to your email.');
+        if (!otpVerified) {
+            setError('Please click "Verify OTP" to verify your email first before submitting registration.');
             return;
         }
 
@@ -199,17 +226,27 @@ const Signup = () => {
                             </div>
 
                             {/* Modern 6-Digit OTP Code Pin Field */}
-                            {otpSent && (
+                            {otpVerified ? (
+                                <div className="md:col-span-2 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold">
+                                        <CheckCircle size={18} className="text-emerald-500" />
+                                        <span>Email Verified: <strong className="font-mono text-emerald-950">{formData.email}</strong></span>
+                                    </div>
+                                    <span className="text-[11px] bg-emerald-200/60 text-emerald-800 font-extrabold px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                                        Verified ✓
+                                    </span>
+                                </div>
+                            ) : otpSent ? (
                                 <div className="md:col-span-2">
                                     <OtpInput
                                         email={formData.email}
                                         onOtpChange={(code) => setOtp(code)}
                                         onResend={handleSendOTP}
-                                        onVerify={handleSubmit}
-                                        sending={sendingOtp}
+                                        onVerify={handleVerifyOTP}
+                                        sending={sendingOtp || verifyingOtp}
                                     />
                                 </div>
-                            )}
+                            ) : null}
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Password *</label>

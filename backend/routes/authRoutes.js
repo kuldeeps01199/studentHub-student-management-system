@@ -4,6 +4,7 @@ const {
     authUser,
     checkAdminExists,
     sendSignupOTP,
+    verifySignupOTP,
     registerAdmin,
     registerStudent,
     registerTeacher,
@@ -18,6 +19,7 @@ const { protect } = require('../middleware/authMiddleware');
 router.get('/admin-exists', checkAdminExists);
 router.post('/login', authUser);
 router.post('/send-signup-otp', sendSignupOTP);
+router.post('/verify-signup-otp', verifySignupOTP);
 router.post('/register-admin', registerAdmin);
 router.post('/register-student', registerStudent);
 router.post('/register-teacher', registerTeacher);
