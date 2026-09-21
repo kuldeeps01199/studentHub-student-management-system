@@ -12,12 +12,15 @@ const ReportCard = () => {
 
     const [allStudents, setAllStudents] = useState([]);
     const [selectedStudentId, setSelectedStudentId] = useState('');
+    const [teachersList, setTeachersList] = useState([]);
 
     useEffect(() => {
         const fetchStudentData = async () => {
             try {
                 const userId = user?._id || user?.id;
                 const { data: studentsData } = await api.get('/students');
+                const { data: teachersData } = await api.get('/teachers').catch(() => ({ data: [] }));
+                setTeachersList(teachersData || []);
 
                 if (user?.role === 'student') {
                     // Student apna khud ka data dekhega
@@ -88,6 +91,13 @@ const ReportCard = () => {
         }
     });
     const attendancePct = totalSessions > 0 ? Math.round((presentCount / totalSessions) * 100) : 0;
+
+    // Find assigned teacher for student's course, or fallback to first teacher
+    const assignedTeacher = teachersList.find(t => 
+        t.assignedCourses?.some(c => String(c._id || c) === String(studentProfile?.course?._id || studentProfile?.course))
+    ) || teachersList[0];
+
+    const classTeacherName = assignedTeacher ? assignedTeacher.fullName : 'Prof. Class In-charge';
 
     const handlePrint = () => {
         window.print();
@@ -302,18 +312,41 @@ const ReportCard = () => {
                 )}
 
                 {/* Signatures & Verification Footer */}
-                <div className="pt-10 border-t border-slate-200 flex justify-between items-end text-xs text-slate-500">
-                    <div className="text-center w-40">
-                        <div className="h-10 border-b border-slate-400 mb-1"></div>
-                        <p className="font-semibold text-slate-700">Class In-charge</p>
+                <div className="pt-12 border-t border-slate-200 grid grid-cols-3 gap-6 items-end text-xs text-slate-500">
+                    {/* 1. Class In-charge (Assigned Teacher Signature) */}
+                    <div className="text-center">
+                        <div className="h-12 flex flex-col justify-end items-center pb-1">
+                            <span className="font-serif italic text-base font-bold text-slate-800 tracking-wide select-none">
+                                {classTeacherName}
+                            </span>
+                            <div className="w-full border-b border-slate-400 mt-1"></div>
+                        </div>
+                        <p className="font-bold text-slate-800 text-xs mt-1.5">{classTeacherName}</p>
+                        <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Class In-charge</p>
                     </div>
-                    <div className="text-center w-40">
-                        <div className="h-10 border-b border-slate-400 mb-1"></div>
-                        <p className="font-semibold text-slate-700">Controller of Exams</p>
+
+                    {/* 2. Controller of Exams (Kuldeep Signature) */}
+                    <div className="text-center">
+                        <div className="h-12 flex flex-col justify-end items-center pb-1">
+                            <span className="font-serif italic text-base font-bold text-slate-800 tracking-wider select-none">
+                                Kuldeep
+                            </span>
+                            <div className="w-full border-b border-slate-400 mt-1"></div>
+                        </div>
+                        <p className="font-bold text-slate-800 text-xs mt-1.5">Kuldeep</p>
+                        <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Controller of Exams</p>
                     </div>
-                    <div className="text-center w-40">
-                        <div className="h-10 border-b border-slate-400 mb-1"></div>
-                        <p className="font-bold text-indigo-900 uppercase">Principal / Dean</p>
+
+                    {/* 3. PRINCIPAL / DEAN (Dr. Kuldeep Signature) */}
+                    <div className="text-center">
+                        <div className="h-12 flex flex-col justify-end items-center pb-1">
+                            <span className="font-serif italic text-base font-bold text-indigo-950 tracking-widest select-none">
+                                Dr. Kuldeep
+                            </span>
+                            <div className="w-full border-b border-indigo-900 mt-1"></div>
+                        </div>
+                        <p className="font-bold text-indigo-950 text-xs mt-1.5 uppercase">Dr. Kuldeep</p>
+                        <p className="text-[11px] font-bold text-indigo-900 uppercase tracking-wider">PRINCIPAL / DEAN</p>
                     </div>
                 </div>
             </div>
