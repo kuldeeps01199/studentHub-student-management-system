@@ -4,9 +4,12 @@ const sendEmail = async (options) => {
     let transporter;
 
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        // Use Gmail service directly (works reliably on Render, Vercel, Railway etc.)
+        // Gmail SMTP with forced IPv4 (Render free tier does not support IPv6)
         transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            family: 4,
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
