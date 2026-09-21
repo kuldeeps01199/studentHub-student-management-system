@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, RefreshCw, CheckCircle2 } from 'lucide-react';
 
-const OtpInput = ({ email, onOtpChange, onResend, sending, initialTimer = 30 }) => {
+const OtpInput = ({ email, onOtpChange, onResend, onVerify, sending, initialTimer = 30 }) => {
     const [digits, setDigits] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(initialTimer);
     const [canResend, setCanResend] = useState(false);
@@ -103,25 +103,37 @@ const OtpInput = ({ email, onOtpChange, onResend, sending, initialTimer = 30 }) 
             </p>
 
             {/* 6 Square Box Pin Inputs */}
-            <div className="flex justify-between items-center gap-2 sm:gap-3 py-1">
-                {digits.map((digit, index) => (
-                    <input
-                        key={index}
-                        ref={(el) => (inputRefs.current[index] = el)}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleChange(index, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(index, e)}
-                        onPaste={handlePaste}
-                        className={`w-10 h-12 sm:w-12 sm:h-14 text-center text-xl font-bold font-mono rounded-xl border transition-all duration-200 focus:outline-none ${
-                            digit
-                                ? 'border-indigo-600 bg-white text-indigo-900 shadow-xs ring-2 ring-indigo-500/20'
-                                : 'border-slate-300 bg-white/90 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30'
-                        }`}
-                    />
-                ))}
+            <div className="flex flex-col sm:flex-row items-center gap-3 py-1">
+                <div className="flex justify-between items-center gap-2 sm:gap-3 flex-1 w-full">
+                    {digits.map((digit, index) => (
+                        <input
+                            key={index}
+                            ref={(el) => (inputRefs.current[index] = el)}
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+                            value={digit}
+                            onChange={(e) => handleChange(index, e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(index, e)}
+                            onPaste={handlePaste}
+                            className={`w-10 h-12 sm:w-12 sm:h-14 text-center text-xl font-bold font-mono rounded-xl border transition-all duration-200 focus:outline-none ${
+                                digit
+                                    ? 'border-indigo-600 bg-white text-indigo-900 shadow-xs ring-2 ring-indigo-500/20'
+                                    : 'border-slate-300 bg-white/90 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30'
+                            }`}
+                        />
+                    ))}
+                </div>
+                {onVerify && (
+                    <button
+                        type="button"
+                        onClick={onVerify}
+                        className="w-full sm:w-auto px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all whitespace-nowrap flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md cursor-pointer"
+                    >
+                        <CheckCircle2 size={16} />
+                        <span>Verify OTP</span>
+                    </button>
+                )}
             </div>
 
             {/* Resend OTP & Helper Info */}

@@ -80,12 +80,12 @@ const Signup = () => {
         setSuccessMsg('');
 
         if (!otpSent) {
-            setError('Please click "Send Verification OTP to Email" to verify your email first.');
+            await handleSendOTP();
             return;
         }
 
-        if (!otp) {
-            setError('Please enter the 6-digit OTP code sent to your email.');
+        if (!otp || otp.trim().length !== 6) {
+            setError('Please enter the complete 6-digit OTP code sent to your email.');
             return;
         }
 
@@ -205,6 +205,7 @@ const Signup = () => {
                                         email={formData.email}
                                         onOtpChange={(code) => setOtp(code)}
                                         onResend={handleSendOTP}
+                                        onVerify={handleSubmit}
                                         sending={sendingOtp}
                                     />
                                 </div>
@@ -279,9 +280,11 @@ const Signup = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-2 shadow-sm"
+                            className="w-full flex justify-center py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-all mt-2 shadow-md hover:shadow-lg"
                         >
-                            {loading ? 'Verifying OTP & Registering...' : !otpSent ? 'Step 1: Click "Send OTP" to Verify Email' : `Step 2: Verify OTP & Register as ${role === 'student' ? 'Student' : 'Teacher'}`}
+                            {loading 
+                                ? 'Verifying & Registering...' 
+                                : `Create ${role === 'student' ? 'Student' : 'Teacher'} Account`}
                         </button>
                     </form>
 

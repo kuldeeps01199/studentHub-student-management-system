@@ -3,30 +3,26 @@ const nodemailer = require('nodemailer');
 const sendEmail = async (options) => {
     let transporter;
 
-    if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        // Use Gmail service directly (works reliably on Render, Vercel, Railway etc.)
         transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: Number(process.env.EMAIL_PORT) || 587,
-            secure: process.env.EMAIL_SECURE === 'true',
+            service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-        });
-    } else {
-        // Fallback test/local transport configuration
-        transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            auth: {
-                user: process.env.ETHEREAL_USER || 'studenthub@ethereal.email',
-                pass: process.env.ETHEREAL_PASS || 'ethereal_pass'
+            tls: {
+                rejectUnauthorized: false
             }
         });
+    } else {
+        // Fallback: log OTP to console when no email credentials configured
+        console.log(`[Email Fallback] No EMAIL_USER/EMAIL_PASS configured. OTP for ${options.email}: check debugOTP in API response.`);
+        return;
     }
 
     const message = {
-        from: `"${process.env.FROM_NAME || 'StudentHub System'}" <${process.env.FROM_EMAIL || 'no-reply@studenthub.com'}>`,
+        from: `"${process.env.FROM_NAME || 'StudentHub System'}" <${process.env.EMAIL_USER}>`,
         to: options.email,
         subject: options.subject,
         text: options.message,
