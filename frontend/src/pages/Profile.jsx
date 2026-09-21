@@ -140,10 +140,46 @@ const Profile = () => {
         }
     };
 
+    // Security OTP State
+    const [secOtpSent, setSecOtpSent] = useState(false);
+    const [secOtpCode, setSecOtpCode] = useState('');
+    const [secSendingOtp, setSecSendingOtp] = useState(false);
+    const [secDebugOtp, setSecDebugOtp] = useState('');
+
+    const handleSendProfileOTP = async () => {
+        setErrorMsg('');
+        setSuccessMsg('');
+        setSecSendingOtp(true);
+        try {
+            const { data } = await api.post('/auth/send-otp', { email: user?.email });
+            setSecOtpSent(true);
+            setSuccessMsg(data.message || `OTP sent to ${user?.email}`);
+            if (data.debugOTP) setSecDebugOtp(data.debugOTP);
+            scrollToAlert();
+        } catch (err) {
+            setErrorMsg(err.response?.data?.message || 'Failed to send OTP to registered email');
+            scrollToAlert();
+        } finally {
+            setSecSendingOtp(false);
+        }
+    };
+
     const handleSavePassword = async (e) => {
         e.preventDefault();
         setErrorMsg('');
         setSuccessMsg('');
+
+        if (!secOtpSent) {
+            setErrorMsg('Please click "Send OTP to Registered Email" to receive your verification code first.');
+            scrollToAlert();
+            return;
+        }
+
+        if (!secOtpCode) {
+            setErrorMsg('Please enter the 6-digit OTP code sent to your email.');
+            scrollToAlert();
+            return;
+        }
 
         if (password.length < 6) {
             setErrorMsg('Password must be at least 6 characters long');
@@ -159,14 +195,21 @@ const Profile = () => {
 
         setSaving(true);
         try {
-            await api.put('/auth/profile', { password });
-            setSuccessMsg('Password changed successfully!');
+            await api.post('/auth/verify-otp-reset-password', {
+                email: user?.email,
+                otp: secOtpCode.trim(),
+                newPassword: password
+            });
+            setSuccessMsg('Password updated successfully via OTP email verification!');
             setPassword('');
             setConfirmPassword('');
+            setSecOtpCode('');
+            setSecOtpSent(false);
+            setSecDebugOtp('');
             scrollToAlert();
             setTimeout(() => setSuccessMsg(''), 4500);
         } catch (err) {
-            setErrorMsg(err.response?.data?.message || 'Failed to update password');
+            setErrorMsg(err.response?.data?.message || 'Failed to update password. Invalid or expired OTP.');
             scrollToAlert();
         } finally {
             setSaving(false);
@@ -646,57 +689,117 @@ const Profile = () => {
 
             {/* Tab 3: Security & Password */}
             {activeTab === 'security' && (
-                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm max-w-2xl">
-                    <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                        <Key size={20} className="text-indigo-600" />
-                        Change Account Password
-                    </h3>
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm max-w-2xl space-y-6">
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <Key size={20} className="text-indigo-600" />
+                            Change Account Password via Email OTP
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1">
+                            To ensure account security, a 6-digit One-Time Password (OTP) will be sent to your registered email address (<strong className="text-slate-800">{user?.email}</strong>).
+                        </p>
+                    </div>
 
-                    <form onSubmit={handleSavePassword} className="space-y-5">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1.5">New Password</label>
-                            <div className="relative">
+                    {secDebugOtp && (
+                        <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-mono text-center">
+                            💡 <strong>Dev Verification OTP Code:</strong> {secDebugOtp}
+                        </div>
+                    )}
+
+                    {!secOtpSent ? (
+                        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 text-center space-y-4">
+                            <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto">
+                                <Mail size={24} />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-slate-800">Email Verification Required</h4>
+                                <p className="text-xs text-slate-500 mt-1">
+                                    Click below to send a 6-digit security OTP to <strong>{user?.email}</strong>
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleSendProfileOTP}
+                                disabled={secSendingOtp}
+                                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition-colors shadow-sm disabled:opacity-50 inline-flex items-center space-x-2"
+                            >
+                                <Mail size={15} />
+                                <span>{secSendingOtp ? 'Sending OTP to Email...' : 'Send OTP to Registered Email'}</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleSavePassword} className="space-y-5">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                                    Enter 6-Digit Verification OTP Code *
+                                </label>
+                                <input 
+                                    type="text"
+                                    required
+                                    maxLength="6"
+                                    placeholder="e.g. 123456"
+                                    value={secOtpCode}
+                                    onChange={(e) => setSecOtpCode(e.target.value)}
+                                    className="w-full px-4 py-2.5 border border-indigo-300 rounded-xl text-base font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                                />
+                                <div className="mt-1 flex justify-between items-center text-xs">
+                                    <span className="text-slate-400">Code sent to {user?.email}</span>
+                                    <button 
+                                        type="button"
+                                        onClick={handleSendProfileOTP} 
+                                        disabled={secSendingOtp}
+                                        className="text-indigo-600 font-semibold hover:underline"
+                                    >
+                                        Resend OTP
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1.5">New Password *</label>
+                                <div className="relative">
+                                    <input 
+                                        type={showPassword ? 'text' : 'password'}
+                                        required
+                                        placeholder="Enter new password (min. 6 characters)"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full px-4 py-2.5 pr-11 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Confirm New Password *</label>
                                 <input 
                                     type={showPassword ? 'text' : 'password'}
                                     required
-                                    placeholder="Enter new password (min. 6 characters)"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-2.5 pr-11 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                    placeholder="Re-enter new password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                                 />
+                            </div>
+
+                            <div className="pt-2 flex justify-end">
                                 <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                                    type="submit"
+                                    disabled={saving}
+                                    className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition-colors shadow-sm disabled:opacity-50 flex items-center space-x-2"
                                 >
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    <Key size={15} />
+                                    <span>{saving ? 'Verifying OTP & Updating...' : 'Verify OTP & Update Password'}</span>
                                 </button>
                             </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1.5">Confirm New Password</label>
-                            <input 
-                                type={showPassword ? 'text' : 'password'}
-                                required
-                                placeholder="Re-enter new password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                            />
-                        </div>
-
-                        <div className="pt-3">
-                            <button
-                                type="submit"
-                                disabled={saving}
-                                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl transition-colors shadow-sm disabled:opacity-50 flex items-center space-x-2"
-                            >
-                                <Key size={16} />
-                                <span>{saving ? 'Updating password...' : 'Update Password'}</span>
-                            </button>
-                        </div>
-                    </form>
+                        </form>
+                    )}
                 </div>
             )}
 

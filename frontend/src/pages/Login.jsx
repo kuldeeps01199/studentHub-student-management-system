@@ -14,13 +14,17 @@ const Login = () => {
     const [submitting, setSubmitting] = useState(false);
     const { login, user, loading } = useContext(AuthContext);
 
-    // Forgot Password Modal State
+    // Forgot Password OTP Modal State
     const [showForgotModal, setShowForgotModal] = useState(false);
     const [forgotEmail, setForgotEmail] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
+    const [otpCode, setOtpCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [sendingOtp, setSendingOtp] = useState(false);
     const [resetting, setResetting] = useState(false);
     const [forgotSuccess, setForgotSuccess] = useState('');
     const [forgotError, setForgotError] = useState('');
+    const [debugOtp, setDebugOtp] = useState('');
 
     if (loading) {
         return (
@@ -38,22 +42,45 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setSubmitting(true);
-        const result = await login(email, password);
+        const result = await login(email, password, selectedRole);
         if (!result.success) {
             setError(result.message || 'Login failed. Please check your credentials.');
         }
         setSubmitting(false);
     };
 
-    const handleResetPassword = async (e) => {
+    const handleSendOTP = async (e) => {
+        if (e) e.preventDefault();
+        setForgotError('');
+        setForgotSuccess('');
+        setSendingOtp(true);
+
+        try {
+            const { data } = await api.post('/auth/send-otp', {
+                email: forgotEmail.trim()
+            });
+            setOtpSent(true);
+            setForgotSuccess(data.message || 'OTP sent successfully to your registered email address!');
+            if (data.debugOTP) {
+                setDebugOtp(data.debugOTP);
+            }
+        } catch (err) {
+            setForgotError(err.response?.data?.message || 'Failed to send OTP. Please check your email.');
+        } finally {
+            setSendingOtp(false);
+        }
+    };
+
+    const handleVerifyOTPAndResetPassword = async (e) => {
         e.preventDefault();
         setForgotError('');
         setForgotSuccess('');
         setResetting(true);
 
         try {
-            const { data } = await api.post('/auth/forgot-password', {
+            const { data } = await api.post('/auth/verify-otp-reset-password', {
                 email: forgotEmail.trim(),
+                otp: otpCode.trim(),
                 newPassword: newPassword
             });
             setForgotSuccess(data.message || 'Password reset successfully!');
@@ -61,10 +88,13 @@ const Login = () => {
                 setShowForgotModal(false);
                 setForgotSuccess('');
                 setForgotEmail('');
+                setOtpCode('');
                 setNewPassword('');
+                setOtpSent(false);
+                setDebugOtp('');
             }, 2500);
         } catch (err) {
-            setForgotError(err.response?.data?.message || 'Failed to reset password. Please check your email.');
+            setForgotError(err.response?.data?.message || 'Failed to verify OTP or reset password.');
         } finally {
             setResetting(false);
         }
@@ -130,7 +160,7 @@ const Login = () => {
 
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm text-center">
+                            <div className="bg-red-50 border border-red-200 text-red-600 p-3.5 rounded-xl text-xs font-semibold text-center leading-relaxed">
                                 {error}
                             </div>
                         )}
@@ -162,7 +192,14 @@ const Login = () => {
                                     <label className="block text-sm font-medium text-slate-700">Password</label>
                                     <button
                                         type="button"
-                                        onClick={() => { setShowForgotModal(true); setForgotEmail(email); }}
+                                        onClick={() => { 
+                                            setShowForgotModal(true); 
+                                            setForgotEmail(email); 
+                                            setOtpSent(false); 
+                                            setForgotError(''); 
+                                            setForgotSuccess(''); 
+                                            setDebugOtp('');
+                                        }}
                                         className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
                                     >
                                         Forgot password?
@@ -212,7 +249,7 @@ const Login = () => {
                 </div>
             </div>
 
-            {/* Forgot Password Modal */}
+            {/* Forgot Password OTP Modal */}
             {showForgotModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl border border-slate-100 relative">
@@ -228,67 +265,127 @@ const Login = () => {
                                 <Key size={20} />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900">Reset Account Password</h3>
-                                <p className="text-xs text-slate-500">Enter your registered email and new password</p>
+                                <h3 className="text-lg font-bold text-slate-900">Reset Password via OTP</h3>
+                                <p className="text-xs text-slate-500">We send a 6-digit OTP code to your registered email</p>
                             </div>
                         </div>
 
                         {forgotSuccess && (
                             <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs flex items-center gap-2">
                                 <CheckCircle size={16} className="text-emerald-500 flex-shrink-0" />
-                                <span>{forgotSuccess}</span>
+                                <span className="font-medium">{forgotSuccess}</span>
                             </div>
                         )}
 
                         {forgotError && (
                             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs flex items-center gap-2">
                                 <AlertCircle size={16} className="text-red-500 flex-shrink-0" />
-                                <span>{forgotError}</span>
+                                <span className="font-medium">{forgotError}</span>
                             </div>
                         )}
 
-                        <form onSubmit={handleResetPassword} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Account Email Address</label>
-                                <input
-                                    type="email"
-                                    required
-                                    placeholder="Enter your registered email"
-                                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                                    value={forgotEmail}
-                                    onChange={(e) => setForgotEmail(e.target.value)}
-                                />
+                        {debugOtp && (
+                            <div className="mb-4 p-2.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-mono text-center">
+                                💡 <strong>Dev OTP:</strong> {debugOtp}
                             </div>
+                        )}
 
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">New Password (min 6 chars)</label>
-                                <input
-                                    type="password"
-                                    required
-                                    placeholder="Enter new password"
-                                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                />
-                            </div>
+                        {!otpSent ? (
+                            <form onSubmit={handleSendOTP} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Account Email Address</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        placeholder="Enter your registered email"
+                                        className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                        value={forgotEmail}
+                                        onChange={(e) => setForgotEmail(e.target.value)}
+                                    />
+                                </div>
 
-                            <div className="flex justify-end space-x-2 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowForgotModal(false)}
-                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={resetting}
-                                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm disabled:opacity-50"
-                                >
-                                    {resetting ? 'Resetting...' : 'Update Password'}
-                                </button>
-                            </div>
-                        </form>
+                                <div className="flex justify-end space-x-2 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowForgotModal(false)}
+                                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={sendingOtp}
+                                        className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm disabled:opacity-50 flex items-center space-x-1.5"
+                                    >
+                                        <span>{sendingOtp ? 'Sending OTP...' : 'Send OTP to Email'}</span>
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <form onSubmit={handleVerifyOTPAndResetPassword} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                                    <input
+                                        type="email"
+                                        disabled
+                                        value={forgotEmail}
+                                        className="w-full px-3.5 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-500 cursor-not-allowed font-medium"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Enter 6-Digit OTP Code *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        maxLength="6"
+                                        placeholder="e.g. 123456"
+                                        className="w-full px-3.5 py-2 border border-indigo-300 rounded-xl text-base font-mono tracking-widest text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                        value={otpCode}
+                                        onChange={(e) => setOtpCode(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 mb-1">New Password (min 6 chars) *</label>
+                                    <input
+                                        type="password"
+                                        required
+                                        placeholder="Enter new password"
+                                        className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleSendOTP}
+                                        disabled={sendingOtp}
+                                        className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold underline"
+                                    >
+                                        Resend OTP
+                                    </button>
+                                    <div className="flex space-x-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowForgotModal(false)}
+                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={resetting}
+                                            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm disabled:opacity-50"
+                                        >
+                                            {resetting ? 'Verifying...' : 'Verify OTP & Reset Password'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
             )}

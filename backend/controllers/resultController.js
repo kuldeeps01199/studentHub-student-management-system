@@ -41,6 +41,15 @@ const getResults = async (req, res) => {
     if (examType) query.examType = examType;
 
     try {
+        if (req.user && req.user.role === 'student') {
+            const Student = require('../models/Student');
+            const myStudent = await Student.findOne({ user: req.user._id });
+            if (!myStudent) {
+                return res.json([]);
+            }
+            query.student = myStudent._id;
+        }
+
         const results = await Result.find(query)
             .populate('student', 'fullName rollNumber')
             .populate('course', 'name')

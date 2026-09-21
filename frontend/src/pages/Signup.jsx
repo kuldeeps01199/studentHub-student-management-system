@@ -3,15 +3,22 @@ import { Link, Navigate } from 'react-router-dom';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import PublicNavbar from '../components/PublicNavbar';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Mail, CheckCircle, ShieldAlert } from 'lucide-react';
 
 const Signup = () => {
     const [role, setRole] = useState('student');
     const [error, setError] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [courses, setCourses] = useState([]);
     const { login, user } = useContext(AuthContext);
+
+    // Signup OTP States
+    const [otpSent, setOtpSent] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [sendingOtp, setSendingOtp] = useState(false);
+    const [debugOtp, setDebugOtp] = useState('');
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -43,9 +50,44 @@ const Signup = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleSendOTP = async () => {
+        setError('');
+        setSuccessMsg('');
+        if (!formData.email) {
+            setError('Please enter your Email Address first.');
+            return;
+        }
+        setSendingOtp(true);
+        try {
+            const { data } = await api.post('/auth/send-signup-otp', {
+                email: formData.email.trim(),
+                role
+            });
+            setOtpSent(true);
+            setSuccessMsg(data.message || `Verification OTP sent to ${formData.email}`);
+            if (data.debugOTP) setDebugOtp(data.debugOTP);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to send verification OTP.');
+        } finally {
+            setSendingOtp(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccessMsg('');
+
+        if (!otpSent) {
+            setError('Please click "Send Verification OTP to Email" to verify your email first.');
+            return;
+        }
+
+        if (!otp) {
+            setError('Please enter the 6-digit OTP code sent to your email.');
+            return;
+        }
+
         setLoading(true);
         try {
             const endpoint = role === 'student' 
@@ -53,8 +95,8 @@ const Signup = () => {
                 : role === 'teacher' 
                 ? '/auth/register-teacher' 
                 : '/auth/register-admin';
-            await api.post(endpoint, formData);
-            await login(formData.email, formData.password);
+            await api.post(endpoint, { ...formData, otp: otp.trim() });
+            await login(formData.email, formData.password, role);
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
             setLoading(false);
@@ -85,14 +127,14 @@ const Signup = () => {
                         <button
                             type="button"
                             className={`flex-1 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${role === 'student' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                            onClick={() => setRole('student')}
+                            onClick={() => { setRole('student'); setOtpSent(false); setDebugOtp(''); }}
                         >
                             👨‍🎓 Student Registration
                         </button>
                         <button
                             type="button"
                             className={`flex-1 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${role === 'teacher' ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                            onClick={() => setRole('teacher')}
+                            onClick={() => { setRole('teacher'); setOtpSent(false); setDebugOtp(''); }}
                         >
                             👨‍🏫 Teacher Registration
                         </button>
@@ -104,9 +146,22 @@ const Signup = () => {
                         </p>
                     </div>
 
+                    {successMsg && (
+                        <div className="mb-4 bg-emerald-50 text-emerald-700 p-3 rounded-lg text-xs font-semibold text-center border border-emerald-200 flex items-center justify-center gap-2">
+                            <CheckCircle size={16} className="text-emerald-500" />
+                            <span>{successMsg}</span>
+                        </div>
+                    )}
+
                     {error && (
-                        <div className="mb-4 bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center border border-red-100 font-medium">
+                        <div className="mb-4 bg-red-50 text-red-600 p-3 rounded-lg text-xs font-semibold text-center border border-red-200">
                             {error}
+                        </div>
+                    )}
+
+                    {debugOtp && (
+                        <div className="mb-4 p-2.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-mono text-center">
+                            💡 <strong>Dev Registration OTP Code:</strong> {debugOtp}
                         </div>
                     )}
 
@@ -117,10 +172,52 @@ const Signup = () => {
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Full Name *</label>
                                 <input name="fullName" required className={inputClass} value={formData.fullName} onChange={handleChange} placeholder="Enter full name" />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Email Address *</label>
-                                <input name="email" type="email" required className={inputClass} value={formData.email} onChange={handleChange} placeholder="example@email.com" />
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Email Address (Verification Required) *</label>
+                                <div className="flex gap-2">
+                                    <input 
+                                        name="email" 
+                                        type="email" 
+                                        required 
+                                        className={inputClass} 
+                                        value={formData.email} 
+                                        onChange={handleChange} 
+                                        placeholder="example@email.com" 
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleSendOTP}
+                                        disabled={sendingOtp || !formData.email}
+                                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-colors whitespace-nowrap shadow-xs flex items-center gap-1"
+                                    >
+                                        <Mail size={14} />
+                                        <span>{sendingOtp ? 'Sending...' : otpSent ? 'Resend OTP' : 'Send OTP'}</span>
+                                    </button>
+                                </div>
                             </div>
+
+                            {/* OTP Code Field */}
+                            {otpSent && (
+                                <div className="md:col-span-2 bg-indigo-50/60 p-4 rounded-xl border border-indigo-200 space-y-2">
+                                    <label className="block text-xs font-bold text-indigo-900 uppercase tracking-wider">
+                                        Enter 6-Digit Email Verification OTP *
+                                    </label>
+                                    <input 
+                                        type="text"
+                                        required
+                                        maxLength="6"
+                                        placeholder="Enter 6-digit code received in email"
+                                        className="w-full px-4 py-2.5 bg-white border border-indigo-300 rounded-lg text-base font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value)}
+                                    />
+                                    <p className="text-[11px] text-indigo-600 text-center font-medium">
+                                        OTP valid for 10 minutes. Sent to {formData.email}
+                                    </p>
+                                </div>
+                            )}
+
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Password *</label>
                                 <div className="relative">
@@ -192,7 +289,7 @@ const Signup = () => {
                             disabled={loading}
                             className="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors mt-2 shadow-sm"
                         >
-                            {loading ? 'Verifying & Creating Account...' : `Register as ${role === 'student' ? 'Student' : 'Teacher'}`}
+                            {loading ? 'Verifying OTP & Registering...' : !otpSent ? 'Step 1: Click "Send OTP" to Verify Email' : `Step 2: Verify OTP & Register as ${role === 'student' ? 'Student' : 'Teacher'}`}
                         </button>
                     </form>
 

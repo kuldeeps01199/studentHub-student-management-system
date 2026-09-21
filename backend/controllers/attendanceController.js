@@ -48,6 +48,22 @@ const getAttendance = async (req, res) => {
             .populate('records.student', 'fullName rollNumber')
             .populate('markedBy', 'name');
             
+        if (req.user && req.user.role === 'student') {
+            const Student = require('../models/Student');
+            const myStudent = await Student.findOne({ user: req.user._id });
+            if (!myStudent) {
+                return res.json([]);
+            }
+            const filtered = attendance.map(att => {
+                const attObj = att.toObject ? att.toObject() : { ...att };
+                attObj.records = (attObj.records || []).filter(r => 
+                    String(r.student?._id || r.student) === String(myStudent._id)
+                );
+                return attObj;
+            });
+            return res.json(filtered);
+        }
+
         res.json(attendance);
     } catch (error) {
         res.status(500).json({ message: error.message });

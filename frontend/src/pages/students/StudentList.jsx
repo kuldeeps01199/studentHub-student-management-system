@@ -289,72 +289,95 @@ const StudentList = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                paginatedStudents.map((student) => (
-                                    <tr key={student._id} className="hover:bg-slate-50/80 transition-colors">
-                                        <td className="p-4">
-                                            <div className="flex items-center space-x-3">
-                                                {student.profileImage ? (
-                                                    <img 
-                                                        src={student.profileImage} 
-                                                        alt={student.fullName} 
-                                                        className="w-10 h-10 rounded-xl object-cover ring-2 ring-indigo-100 flex-shrink-0"
-                                                    />
-                                                ) : (
-                                                    <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-2xs">
-                                                        {student.fullName?.charAt(0).toUpperCase()}
+                                paginatedStudents.map((student) => {
+                                    const isSelf = String(student.user?._id || student.user) === String(user?._id);
+                                    const canViewFull = isAdmin || user?.role === 'teacher' || isSelf;
+
+                                    return (
+                                        <tr key={student._id} className="hover:bg-slate-50/80 transition-colors">
+                                            <td className="p-4">
+                                                <div className="flex items-center space-x-3">
+                                                    {student.profileImage && canViewFull ? (
+                                                        <img 
+                                                            src={student.profileImage} 
+                                                            alt={student.fullName} 
+                                                            className="w-10 h-10 rounded-xl object-cover ring-2 ring-indigo-100 flex-shrink-0"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-2xs">
+                                                            {student.fullName?.charAt(0).toUpperCase()}
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <p className="font-semibold text-slate-800 text-sm">{student.fullName}</p>
+                                                        {canViewFull && student.admissionNumber && (
+                                                            <p className="text-xs text-slate-400">{student.admissionNumber}</p>
+                                                        )}
                                                     </div>
-                                                )}
-                                                <div>
-                                                    <p className="font-semibold text-slate-800 text-sm">{student.fullName}</p>
-                                                    <p className="text-xs text-slate-400">{student.admissionNumber}</p>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-slate-700 text-sm font-medium">{student.rollNumber}</td>
-                                        <td className="p-4 text-slate-600 text-sm">
-                                            <p className="font-medium text-slate-800">{student.course?.name || 'Unassigned'}</p>
-                                            <p className="text-xs text-slate-400">{student.semester || 'Semester 1'}</p>
-                                        </td>
-                                        <td className="p-4 text-xs text-slate-600 space-y-0.5">
-                                            <p className="truncate max-w-[150px]">{student.user?.email || 'N/A'}</p>
-                                            <p className="text-slate-400">{student.phone || 'N/A'}</p>
-                                        </td>
-                                        <td className="p-4">
-                                            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusBadge(student.status)}`}>
-                                                {student.status || 'Active'}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 text-right">
-                                            <div className="flex justify-end space-x-2">
-                                                <button 
-                                                    onClick={() => handleOpenStudentModal(student)} 
-                                                    className="text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 p-1.5 rounded-lg transition-colors" 
-                                                    title="View Detailed Student Profile"
-                                                >
-                                                    <Eye size={15} />
-                                                </button>
-                                                {isAdmin && (
-                                                    <>
-                                                        <Link 
-                                                            to={`/students/${student._id}/edit`} 
-                                                            className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-1.5 rounded-lg transition-colors" 
-                                                            title="Edit Student"
-                                                        >
-                                                            <Edit size={15} />
-                                                        </Link>
-                                                        <button 
-                                                            onClick={() => handleDelete(student._id)} 
-                                                            className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors" 
-                                                            title="Delete Student"
-                                                        >
-                                                            <Trash2 size={15} />
-                                                        </button>
-                                                    </>
+                                            </td>
+                                            <td className="p-4 text-slate-700 text-sm font-medium">
+                                                {canViewFull ? (student.rollNumber || 'N/A') : <span className="text-slate-400 text-xs italic">Protected</span>}
+                                            </td>
+                                            <td className="p-4 text-slate-600 text-sm">
+                                                <p className="font-medium text-slate-800">{student.course?.name || 'Unassigned'}</p>
+                                                {canViewFull && (
+                                                    <p className="text-xs text-slate-400">{student.semester || 'Semester 1'}</p>
                                                 )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
+                                            </td>
+                                            <td className="p-4 text-xs text-slate-600 space-y-0.5">
+                                                {canViewFull ? (
+                                                    <>
+                                                        <p className="truncate max-w-[150px]">{student.user?.email || 'N/A'}</p>
+                                                        <p className="text-slate-400">{student.phone || 'N/A'}</p>
+                                                    </>
+                                                ) : (
+                                                    <span className="text-slate-400 text-xs italic">Protected</span>
+                                                )}
+                                            </td>
+                                            <td className="p-4">
+                                                {canViewFull ? (
+                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusBadge(student.status)}`}>
+                                                        {student.status || 'Active'}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-slate-400 text-xs italic">Protected</span>
+                                                )}
+                                            </td>
+                                            <td className="p-4 text-right">
+                                                <div className="flex justify-end space-x-2">
+                                                    {canViewFull && (
+                                                        <button 
+                                                            onClick={() => handleOpenStudentModal(student)} 
+                                                            className="text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 p-1.5 rounded-lg transition-colors" 
+                                                            title="View Detailed Student Profile"
+                                                        >
+                                                            <Eye size={15} />
+                                                        </button>
+                                                    )}
+                                                    {isAdmin && (
+                                                        <>
+                                                            <Link 
+                                                                to={`/students/${student._id}/edit`} 
+                                                                className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-1.5 rounded-lg transition-colors" 
+                                                                title="Edit Student"
+                                                            >
+                                                                <Edit size={15} />
+                                                            </Link>
+                                                            <button 
+                                                                onClick={() => handleDelete(student._id)} 
+                                                                className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors" 
+                                                                title="Delete Student"
+                                                            >
+                                                                <Trash2 size={15} />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             )}
                         </tbody>
                     </table>

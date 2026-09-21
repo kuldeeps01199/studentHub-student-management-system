@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema(
             required: true,
             default: 'student',
         },
+        resetOTP: {
+            type: String,
+        },
+        resetOTPExpires: {
+            type: Date,
+        },
     },
     {
         timestamps: true,

@@ -6,6 +6,27 @@ const Student = require('../models/Student');
 const getStudents = async (req, res) => {
     try {
         const students = await Student.find().populate('user', 'name email').populate('course', 'name');
+
+        if (req.user && req.user.role === 'student') {
+            const sanitizedStudents = students.map(s => {
+                const isOwner = s.user && String(s.user._id || s.user) === String(req.user._id);
+                if (isOwner) {
+                    return s;
+                } else {
+                    return {
+                        _id: s._id,
+                        fullName: s.fullName,
+                        user: {
+                            _id: s.user?._id,
+                            name: s.user?.name || s.fullName
+                        },
+                        course: s.course ? { name: s.course.name } : null
+                    };
+                }
+            });
+            return res.json(sanitizedStudents);
+        }
+
         res.json(students);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -19,6 +40,20 @@ const getStudentById = async (req, res) => {
     try {
         const student = await Student.findById(req.params.id).populate('user', 'name email').populate('course', 'name');
         if (student) {
+            if (req.user && req.user.role === 'student') {
+                const isOwner = student.user && String(student.user._id || student.user) === String(req.user._id);
+                if (!isOwner) {
+                    return res.json({
+                        _id: student._id,
+                        fullName: student.fullName,
+                        user: {
+                            _id: student.user?._id,
+                            name: student.user?.name || student.fullName
+                        },
+                        course: student.course ? { name: student.course.name } : null
+                    });
+                }
+            }
             res.json(student);
         } else {
             res.status(404).json({ message: 'Student not found' });

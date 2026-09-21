@@ -2,6 +2,31 @@ const Teacher = require('../models/Teacher');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+const sanitizeTeacher = (teacher, reqUser) => {
+    if (!reqUser) return teacher;
+
+    if (reqUser.role === 'student') {
+        return {
+            _id: teacher._id,
+            fullName: teacher.fullName,
+            assignedSubjects: teacher.assignedSubjects || []
+        };
+    }
+
+    if (reqUser.role === 'teacher') {
+        const isSelf = teacher.user && String(teacher.user._id || teacher.user) === String(reqUser._id);
+        if (!isSelf) {
+            return {
+                _id: teacher._id,
+                fullName: teacher.fullName,
+                assignedSubjects: teacher.assignedSubjects || []
+            };
+        }
+    }
+
+    return teacher;
+};
+
 // @desc    Get all teachers
 // @route   GET /api/teachers
 // @access  Private
@@ -11,6 +36,12 @@ const getTeachers = async (req, res) => {
             .populate('user', 'name email role')
             .populate('assignedSubjects')
             .populate('assignedCourses');
+
+        if (req.user && (req.user.role === 'student' || req.user.role === 'teacher')) {
+            const sanitized = teachers.map(t => sanitizeTeacher(t, req.user));
+            return res.json(sanitized);
+        }
+
         res.json(teachers);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -64,6 +95,9 @@ const getTeacherById = async (req, res) => {
             .populate('assignedSubjects')
             .populate('assignedCourses');
         if (teacher) {
+            if (req.user && (req.user.role === 'student' || req.user.role === 'teacher')) {
+                return res.json(sanitizeTeacher(teacher, req.user));
+            }
             res.json(teacher);
         } else {
             res.status(404).json({ message: 'Teacher not found' });

@@ -22,9 +22,9 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (email, password, role) => {
         try {
-            const { data } = await axios.post(`${import.meta.env.VITE_AUTH_URL || 'http://localhost:5000/api'}/auth/login`, { email, password });
+            const { data } = await axios.post(`${import.meta.env.VITE_AUTH_URL || 'http://localhost:5000/api'}/auth/login`, { email, password, role });
             setUser(data);
             sessionStorage.setItem('user', JSON.stringify(data));
             localStorage.removeItem('user');
