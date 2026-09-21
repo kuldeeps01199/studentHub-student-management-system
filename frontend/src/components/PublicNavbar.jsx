@@ -1,7 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const PublicNavbar = () => {
+    const location = useLocation();
+    const isLoginPage = location.pathname === '/login';
+    const isSignupPage = location.pathname === '/signup';
+
     return (
         <nav className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,12 +34,16 @@ const PublicNavbar = () => {
                     </Link>
 
                     <div className="flex items-center space-x-3">
-                        <Link to="/login" className="text-slate-600 hover:text-indigo-600 px-4 py-2 rounded-xl text-sm font-semibold transition-colors border border-slate-200 hover:border-indigo-300">
-                            Sign In
-                        </Link>
-                        <Link to="/signup" className="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-xl text-sm font-semibold transition-colors shadow-sm">
-                            Get Started
-                        </Link>
+                        {!isLoginPage && (
+                            <Link to="/login" className="text-slate-600 hover:text-indigo-600 px-4 py-2 rounded-xl text-sm font-semibold transition-colors border border-slate-200 hover:border-indigo-300">
+                                Sign In
+                            </Link>
+                        )}
+                        {!isSignupPage && (
+                            <Link to="/signup" className="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                                Get Started
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
