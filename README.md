@@ -6,7 +6,8 @@ A complete, production-ready **StudentHub – Student Management System** built 
 
 ## 🔗 Live Demo & Links
 
-- 🌐 **Live Application URL**: [https://studenthub-student-management-system.onrender.com](https://studenthub-student-management-system.onrender.com/)
+- 🌐 **Vercel Frontend Live App**: [https://student-hub-student-management-syst.vercel.app](https://student-hub-student-management-syst.vercel.app/)
+- ⚙️ **Render Backend API URL**: [https://studenthub-student-management-system.onrender.com](https://studenthub-student-management-system.onrender.com/)
 - 📦 **GitHub Repository**: [https://github.com/kuldeeps01199/studentHub-student-management-system](https://github.com/kuldeeps01199/studentHub-student-management-system)
 
 ---
@@ -55,9 +56,7 @@ A complete, production-ready **StudentHub – Student Management System** built 
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React.js 19, React Router v7, Axios, Tailwind CSS v4, Chart.js, Lucide Icons, jsPDF, ExcelJS
-- **Backend**: Node.js, Express.js v5, Mongoose v9, JWT (`jsonwebtoken`), BcryptJS, Multer, PDFKit, Nodemailer
-- **Database**: MongoDB (Local `mongodb://127.0.0.1:27017/student_management` or MongoDB Atlas Cloud)
+**MERN Stack**: React.js 19, Node.js, Express.js v5, MongoDB/Mongoose v9, Tailwind CSS v4, JWT (`jsonwebtoken`), Resend API, Brevo HTTPS API, Chart.js, jsPDF, ExcelJS, Lucide Icons, BcryptJS, Nodemailer
 
 ---
 

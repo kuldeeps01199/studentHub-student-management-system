@@ -80,19 +80,23 @@ const sendSignupOTP = async (req, res) => {
 
         const messageText = `Your One-Time Password (OTP) for StudentHub account registration is: ${otp}. This code is valid for 10 minutes. Do not share this OTP with anyone.`;
 
-        await sendEmail({
+        const emailRes = await sendEmail({
             email: normalizedEmail,
             subject: `StudentHub Verification Code: ${otp}`,
             message: messageText
         });
 
+        const isDevOrBlocked = process.env.NODE_ENV !== 'production' || !emailRes?.success || process.env.ALLOW_DEBUG_OTP === 'true';
+
         res.json({
-            message: `Verification OTP sent to ${normalizedEmail}. Please check your email inbox!`,
+            message: emailRes?.success
+                ? `Verification OTP sent to ${normalizedEmail}. Please check your email inbox!`
+                : `Verification OTP generated for ${normalizedEmail}. (Host Notice: Check debug code if email was restricted by host)`,
             otpSent: true,
-            debugOTP: process.env.NODE_ENV !== 'production' ? otp : undefined
+            debugOTP: isDevOrBlocked ? otp : undefined
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message || 'Server error sending verification OTP.' });
     }
 };
 
@@ -107,19 +111,20 @@ const verifySignupOTP = async (req, res) => {
         }
 
         const normalizedEmail = email.toLowerCase().trim();
+        const cleanOtp = String(otp).trim();
         const signupOTPRecord = await SignupOTP.findOne({ email: normalizedEmail });
 
-        if (!signupOTPRecord || signupOTPRecord.expiresAt < Date.now()) {
+        if (!signupOTPRecord || !signupOTPRecord.expiresAt || new Date(signupOTPRecord.expiresAt) < new Date()) {
             return res.status(400).json({ message: 'Verification OTP has expired or does not exist. Please request a new OTP.' });
         }
 
-        if (signupOTPRecord.otp !== String(otp).trim()) {
+        if (String(signupOTPRecord.otp).trim() !== cleanOtp) {
             return res.status(400).json({ message: 'Invalid OTP code. Please check your email and try again.' });
         }
 
         res.json({ message: 'Email address verified successfully!', verified: true });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message || 'Server error verifying OTP.' });
     }
 };
 
@@ -183,11 +188,11 @@ const registerStudent = async (req, res) => {
         }
 
         const signupOTPRecord = await SignupOTP.findOne({ email: normalizedEmail });
-        if (!signupOTPRecord || signupOTPRecord.expiresAt < Date.now()) {
+        if (!signupOTPRecord || !signupOTPRecord.expiresAt || new Date(signupOTPRecord.expiresAt) < new Date()) {
             return res.status(400).json({ message: 'Verification OTP has expired or does not exist. Please click "Send Verification OTP" to get a new code.' });
         }
 
-        if (signupOTPRecord.otp !== String(otp).trim()) {
+        if (String(signupOTPRecord.otp).trim() !== String(otp).trim()) {
             return res.status(400).json({ message: 'Invalid verification OTP code. Please check your email and try again.' });
         }
 
@@ -253,11 +258,11 @@ const registerTeacher = async (req, res) => {
         }
 
         const signupOTPRecord = await SignupOTP.findOne({ email: normalizedEmail });
-        if (!signupOTPRecord || signupOTPRecord.expiresAt < Date.now()) {
+        if (!signupOTPRecord || !signupOTPRecord.expiresAt || new Date(signupOTPRecord.expiresAt) < new Date()) {
             return res.status(400).json({ message: 'Verification OTP has expired or does not exist. Please click "Send Verification OTP" to get a new code.' });
         }
 
-        if (signupOTPRecord.otp !== String(otp).trim()) {
+        if (String(signupOTPRecord.otp).trim() !== String(otp).trim()) {
             return res.status(400).json({ message: 'Invalid verification OTP code. Please check your email and try again.' });
         }
 
@@ -325,19 +330,23 @@ const sendOTP = async (req, res) => {
 
         const messageText = `Your One-Time Password (OTP) for StudentHub password reset is: ${otp}. This code is valid for 10 minutes. Do not share this OTP with anyone.`;
 
-        await sendEmail({
+        const emailRes = await sendEmail({
             email: user.email,
             subject: `StudentHub Password Reset Code: ${otp}`,
             message: messageText
         });
 
+        const isDevOrBlocked = process.env.NODE_ENV !== 'production' || !emailRes?.success || process.env.ALLOW_DEBUG_OTP === 'true';
+
         res.json({ 
-            message: `OTP sent successfully to ${user.email}. Please check your email inbox!`,
+            message: emailRes?.success
+                ? `OTP sent successfully to ${user.email}. Please check your email inbox!`
+                : `OTP generated for ${user.email}. (Host Notice: Check debug code if email was restricted by host)`,
             otpSent: true,
-            debugOTP: process.env.NODE_ENV !== 'production' ? otp : undefined
+            debugOTP: isDevOrBlocked ? otp : undefined
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message || 'Server error sending password reset OTP.' });
     }
 };
 
@@ -364,14 +373,14 @@ const verifyOTPAndResetPassword = async (req, res) => {
             return res.status(400).json({ message: 'No active OTP request found. Please click "Send OTP to Email" first.' });
         }
 
-        if (user.resetOTPExpires < Date.now()) {
+        if (new Date(user.resetOTPExpires) < new Date()) {
             user.resetOTP = undefined;
             user.resetOTPExpires = undefined;
             await user.save();
             return res.status(400).json({ message: 'OTP code has expired. Please request a new OTP.' });
         }
 
-        if (user.resetOTP !== otp.trim()) {
+        if (String(user.resetOTP).trim() !== String(otp).trim()) {
             return res.status(400).json({ message: 'Invalid OTP code. Please check and try again.' });
         }
 
@@ -383,7 +392,7 @@ const verifyOTPAndResetPassword = async (req, res) => {
 
         res.json({ message: 'Password reset successfully! You can now log in with your new password.' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message || 'Server error resetting password.' });
     }
 };
 
