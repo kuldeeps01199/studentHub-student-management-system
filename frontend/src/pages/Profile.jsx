@@ -144,7 +144,6 @@ const Profile = () => {
     const [secOtpSent, setSecOtpSent] = useState(false);
     const [secOtpCode, setSecOtpCode] = useState('');
     const [secSendingOtp, setSecSendingOtp] = useState(false);
-    const [secDebugOtp, setSecDebugOtp] = useState('');
 
     const handleSendProfileOTP = async () => {
         setErrorMsg('');
@@ -154,7 +153,6 @@ const Profile = () => {
             const { data } = await api.post('/auth/send-otp', { email: user?.email });
             setSecOtpSent(true);
             setSuccessMsg(data.message || `OTP sent to ${user?.email}`);
-            if (data.debugOTP) setSecDebugOtp(data.debugOTP);
             scrollToAlert();
         } catch (err) {
             setErrorMsg(err.response?.data?.message || 'Failed to send OTP to registered email');
@@ -205,7 +203,6 @@ const Profile = () => {
             setConfirmPassword('');
             setSecOtpCode('');
             setSecOtpSent(false);
-            setSecDebugOtp('');
             scrollToAlert();
             setTimeout(() => setSuccessMsg(''), 4500);
         } catch (err) {
@@ -699,12 +696,6 @@ const Profile = () => {
                             To ensure account security, a 6-digit One-Time Password (OTP) will be sent to your registered email address (<strong className="text-slate-800">{user?.email}</strong>).
                         </p>
                     </div>
-
-                    {secDebugOtp && (
-                        <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-mono text-center">
-                            💡 <strong>Dev Verification OTP Code:</strong> {secDebugOtp}
-                        </div>
-                    )}
 
                     {!secOtpSent ? (
                         <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 text-center space-y-4">

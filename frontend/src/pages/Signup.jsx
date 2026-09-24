@@ -21,7 +21,6 @@ const Signup = () => {
     const [otp, setOtp] = useState('');
     const [sendingOtp, setSendingOtp] = useState(false);
     const [verifyingOtp, setVerifyingOtp] = useState(false);
-    const [debugOtp, setDebugOtp] = useState('');
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -69,7 +68,6 @@ const Signup = () => {
             setOtpSent(true);
             setOtpVerified(false);
             setSuccessMsg(data.message || `Verification OTP sent to ${formData.email}`);
-            if (data.debugOTP) setDebugOtp(data.debugOTP);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to send verification OTP.');
         } finally {
@@ -155,14 +153,14 @@ const Signup = () => {
                         <button
                             type="button"
                             className={`flex-1 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${role === 'student' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                            onClick={() => { setRole('student'); setOtpSent(false); setDebugOtp(''); }}
+                            onClick={() => { setRole('student'); setOtpSent(false); }}
                         >
                             👨‍🎓 Student Registration
                         </button>
                         <button
                             type="button"
                             className={`flex-1 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${role === 'teacher' ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                            onClick={() => { setRole('teacher'); setOtpSent(false); setDebugOtp(''); }}
+                            onClick={() => { setRole('teacher'); setOtpSent(false); }}
                         >
                             👨‍🏫 Teacher Registration
                         </button>
@@ -184,13 +182,6 @@ const Signup = () => {
                     {error && (
                         <div className="mb-4 bg-red-50 text-red-600 p-3 rounded-lg text-xs font-semibold text-center border border-red-200">
                             {error}
-                        </div>
-                    )}
-
-                    {debugOtp && (
-                        <div className="mb-4 p-3 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl text-xs font-semibold text-center shadow-xs flex items-center justify-center gap-2">
-                            <span className="text-base">🔑</span>
-                            <span><strong>Instant Verification Code:</strong> <code className="bg-amber-200/80 px-2 py-0.5 rounded text-amber-950 font-bold text-sm tracking-widest">{debugOtp}</code></span>
                         </div>
                     )}
 

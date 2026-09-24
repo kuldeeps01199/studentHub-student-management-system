@@ -80,20 +80,15 @@ const sendSignupOTP = async (req, res) => {
 
         const messageText = `Your One-Time Password (OTP) for StudentHub account registration is: ${otp}. This code is valid for 10 minutes. Do not share this OTP with anyone.`;
 
-        const emailRes = await sendEmail({
+        await sendEmail({
             email: normalizedEmail,
             subject: `StudentHub Verification Code: ${otp}`,
             message: messageText
         });
 
-        const isDevOrBlocked = process.env.NODE_ENV !== 'production' || !emailRes?.success || process.env.ALLOW_DEBUG_OTP === 'true';
-
         res.json({
-            message: emailRes?.success
-                ? `Verification OTP sent to ${normalizedEmail}. Please check your email inbox!`
-                : `Verification OTP generated for ${normalizedEmail}. (Host Notice: Check debug code if email was restricted by host)`,
-            otpSent: true,
-            debugOTP: isDevOrBlocked ? otp : undefined
+            message: `Verification OTP sent to ${normalizedEmail}. Please check your email inbox!`,
+            otpSent: true
         });
     } catch (error) {
         res.status(500).json({ message: error.message || 'Server error sending verification OTP.' });
@@ -330,20 +325,15 @@ const sendOTP = async (req, res) => {
 
         const messageText = `Your One-Time Password (OTP) for StudentHub password reset is: ${otp}. This code is valid for 10 minutes. Do not share this OTP with anyone.`;
 
-        const emailRes = await sendEmail({
+        await sendEmail({
             email: user.email,
             subject: `StudentHub Password Reset Code: ${otp}`,
             message: messageText
         });
 
-        const isDevOrBlocked = process.env.NODE_ENV !== 'production' || !emailRes?.success || process.env.ALLOW_DEBUG_OTP === 'true';
-
         res.json({ 
-            message: emailRes?.success
-                ? `OTP sent successfully to ${user.email}. Please check your email inbox!`
-                : `OTP generated for ${user.email}. (Host Notice: Check debug code if email was restricted by host)`,
-            otpSent: true,
-            debugOTP: isDevOrBlocked ? otp : undefined
+            message: `OTP sent successfully to ${user.email}. Please check your email inbox!`,
+            otpSent: true
         });
     } catch (error) {
         res.status(500).json({ message: error.message || 'Server error sending password reset OTP.' });

@@ -25,7 +25,6 @@ const Login = () => {
     const [resetting, setResetting] = useState(false);
     const [forgotSuccess, setForgotSuccess] = useState('');
     const [forgotError, setForgotError] = useState('');
-    const [debugOtp, setDebugOtp] = useState('');
 
     if (loading) {
         return (
@@ -62,9 +61,6 @@ const Login = () => {
             });
             setOtpSent(true);
             setForgotSuccess(data.message || 'OTP sent successfully to your registered email address!');
-            if (data.debugOTP) {
-                setDebugOtp(data.debugOTP);
-            }
         } catch (err) {
             setForgotError(err.response?.data?.message || 'Failed to send OTP. Please check your email.');
         } finally {
@@ -92,7 +88,6 @@ const Login = () => {
                 setOtpCode('');
                 setNewPassword('');
                 setOtpSent(false);
-                setDebugOtp('');
             }, 2500);
         } catch (err) {
             setForgotError(err.response?.data?.message || 'Failed to verify OTP or reset password.');
@@ -199,7 +194,6 @@ const Login = () => {
                                             setOtpSent(false); 
                                             setForgotError(''); 
                                             setForgotSuccess(''); 
-                                            setDebugOtp('');
                                         }}
                                         className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
                                     >
@@ -282,12 +276,6 @@ const Login = () => {
                             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs flex items-center gap-2">
                                 <AlertCircle size={16} className="text-red-500 flex-shrink-0" />
                                 <span className="font-medium">{forgotError}</span>
-                            </div>
-                        )}
-
-                        {debugOtp && (
-                            <div className="mb-4 p-2.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-mono text-center">
-                                💡 <strong>Dev OTP:</strong> {debugOtp}
                             </div>
                         )}
 
