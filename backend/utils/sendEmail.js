@@ -2,16 +2,55 @@ const nodemailer = require('nodemailer');
 const dns = require('dns');
 const https = require('https');
 
-// Send email with Brevo API, Resend API, or SMTP fallback
+// Send email via Gmail SMTP (delivers to Primary Inbox) with Brevo/Resend HTTPS fallback
 const sendEmail = async (options) => {
     const emailUser = process.env.EMAIL_USER || process.env.FROM_EMAIL;
-    const emailPass = process.env.EMAIL_PASS;
+    // Clean spaces from Gmail App Password (e.g. "abcd efgh ijkl mnop" -> "abcdefghijklmnop")
+    const rawPass = process.env.EMAIL_PASS || '';
+    const emailPass = rawPass.replace(/\s+/g, '');
     const brevoApiKey = process.env.BREVO_API_KEY;
     const resendApiKey = process.env.RESEND_API_KEY;
     const fromName = process.env.FROM_NAME || 'StudentHub System';
     const senderEmail = process.env.FROM_EMAIL || emailUser || 'noreply@studenthub.com';
 
-    // Try Brevo HTTPS API first
+    // Method 1: Gmail SMTP (Port 465 SSL) - Primary for Instant Inbox Delivery
+    if (emailUser && emailPass) {
+        try {
+            await sendSmtpEmail({
+                host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                emailUser,
+                emailPass,
+                fromName,
+                senderEmail,
+                options
+            });
+            console.log(`[Gmail SMTP 465] Email delivered to ${options.email}`);
+            return { success: true, provider: 'Gmail SMTP (465)' };
+        } catch (err465) {
+            console.error(`[SMTP 465 Notice] ${err465.message}. Trying SMTP 587...`);
+            // Try Port 587 TLS
+            try {
+                await sendSmtpEmail({
+                    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+                    port: 587,
+                    secure: false,
+                    emailUser,
+                    emailPass,
+                    fromName,
+                    senderEmail,
+                    options
+                });
+                console.log(`[Gmail SMTP 587] Email delivered to ${options.email}`);
+                return { success: true, provider: 'Gmail SMTP (587)' };
+            } catch (err587) {
+                console.error(`[SMTP 587 Notice] ${err587.message}. Trying cloud API fallback...`);
+            }
+        }
+    }
+
+    // Method 2: Brevo HTTPS REST API (Fallback for cloud hosting port blocks)
     if (brevoApiKey) {
         try {
             await sendBrevoApiEmail(brevoApiKey, fromName, senderEmail, options);
@@ -22,7 +61,7 @@ const sendEmail = async (options) => {
         }
     }
 
-    // Fallback to Resend API if available
+    // Method 3: Resend HTTPS REST API (Backup cloud provider)
     if (resendApiKey) {
         try {
             await sendResendApiEmail(resendApiKey, fromName, senderEmail, options);
@@ -31,28 +70,6 @@ const sendEmail = async (options) => {
         } catch (err) {
             console.error(`[Resend API Error] ${err.message}`);
         }
-    }
-
-    // Fallback to SMTP
-    if (emailUser && emailPass) {
-        try {
-            await sendSmtpEmail({
-                host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-                port: parseInt(process.env.EMAIL_PORT, 10) || 465,
-                secure: process.env.EMAIL_SECURE === 'true' || parseInt(process.env.EMAIL_PORT, 10) === 465,
-                emailUser,
-                emailPass,
-                fromName,
-                senderEmail,
-                options
-            });
-            console.log(`[SMTP] Email sent to ${options.email}`);
-            return { success: true, provider: 'SMTP' };
-        } catch (err) {
-            console.error(`[SMTP Error] ${err.message}`);
-        }
-    } else {
-        console.warn(`[Email] No SMTP credentials provided`);
     }
 
     return { success: false, error: 'Failed to send email with all providers' };
